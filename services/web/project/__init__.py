@@ -70,12 +70,11 @@ bert_model = 'bert-base-multilingual-uncased'
 model_file = os.path.join(DIRECTORIES['ml_hate_speech_path'], 'pytorch_model_epoch_20_seqlen_256.bin')
 
 
-#print(os.path.isfile(model_file))
-#if not os.path.isfile(model_file):
-#    print('Downloading model ...')
-#    model_url = "https://www.dropbox.com/s/2r5s5hbovt9ig7y/#pytorch_model_epoch_20_seqlen_256.bin?dl=0"
-#    wget.download(model_url, DIRECTORIES['ml_hate_speech_path'])
-#print(model_file)
+print(os.path.isfile(model_file))
+if not os.path.isfile(model_file):
+    print('Downloading model ...')
+    os.system('sh ./models/ml_hate_speech_classifier/model_download.sh')
+print(model_file)
 if torch.cuda.is_available():
     model_state_dict = torch.load(model_file)
 else:
