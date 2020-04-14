@@ -21,6 +21,14 @@ In short, you need to:
 
 #### Development
 
+
+Firt download the pre-trained model from root directory 
+
+```sh
+wget -O ./services/web/project/models/ml_hate_speech_classifier/pytorch_model_epoch_20_seqlen_256.bin  https://www.dropbox.com/s/2r5s5hbovt9ig7y/pytorch_model_epoch_20_seqlen_256.bin
+```
+
+
 The following command
 
 ```sh
@@ -30,6 +38,11 @@ $ docker-compose up -d --build
 will build the images and run the containers. If you go to [http://localhost:5000](http://localhost:5000) you will see a web interface where you can check and test your REST API. Flower monitor for Celery is running on [http://localhost:5555](http://localhost:5555). Note that the `web` folder is mounted into the container and the Flask development server reloads your code automatically so any changes will be visible immediately.
 
 #### Production
+
+
+
+
+
 
 The following command
 
