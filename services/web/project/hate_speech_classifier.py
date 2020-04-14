@@ -37,11 +37,48 @@ from torch.utils.data import TensorDataset, DataLoader, RandomSampler, Sequentia
 #from pytorch_pretrained_bert.file_utils import PYTORCH_PRETRAINED_BERT_CACHE
 #from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
+
+from pytorch_pretrained_bert.tokenization import BertTokenizer
+from pytorch_pretrained_bert.modeling import BertForSequenceClassification
+
+
 logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt = '%m/%d/%Y %H:%M:%S',
                     level = logging.INFO)
 logger = logging.getLogger(__name__)
 
+
+class ModelLoad():
+
+    def __init__(self):
+        # configuration
+        ROOT_FOLDER = os.path.dirname(__file__)
+        DIRECTORIES = {
+            'ml_hate_speech_path': os.path.join(ROOT_FOLDER, 'models/ml_hate_speech_classifier')
+        }
+
+        # Load a trained model that you have fine-tuned
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.bert_model = 'bert-base-multilingual-uncased'
+        self.model_file = os.path.join(DIRECTORIES['ml_hate_speech_path'], 'pytorch_model_epoch_20_seqlen_256.bin')
+
+        print(os.path.isfile(self.model_file))
+        if not os.path.isfile(self.model_file):
+            print('Downloading model ...')
+            os.system('sh ./models/ml_hate_speech_classifier/model_download.sh')
+        print(self.model_file)
+
+    def load_models(self):
+
+        if torch.cuda.is_available():
+            model_state_dict = torch.load(self.model_file)
+        else:
+            model_state_dict = torch.load(self.model_file, map_location='cpu')
+        model = BertForSequenceClassification.from_pretrained(self.bert_model, state_dict=model_state_dict, num_labels=2)
+        model.to(self.device)
+        tokenizer = BertTokenizer.from_pretrained(self.bert_model, do_lower_case=True)
+
+        return model,tokenizer
 
 class InputExample(object):
     """A single training/test example for simple sequence classification."""

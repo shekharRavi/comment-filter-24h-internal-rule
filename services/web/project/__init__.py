@@ -1,6 +1,6 @@
 import os
 import json
-import wget
+# import wget
 
 from flask import (
     Flask,
@@ -20,7 +20,7 @@ from flask_restx import Api, Resource, fields, abort, reqparse
 from celery import Celery
 import celery.states as states
 
-from . import api_functions
+# from . import api_functions
 
 
 # global variables
@@ -35,25 +35,15 @@ db = SQLAlchemy(app)
 api = Api(app, version='1.0',
           title='API services',
           description='dockerized flask+flask_restx+gunicorn+celery+redis+postgres+nginx skeleton for REST APIs')
-ns = api.namespace('rest_api', description='REST services API')
-
+# ns = api.namespace('rest_api', description='REST services API')
+# app.run(debug=True)
 
 # ================================================================================================================================
-import torch
-from pytorch_pretrained_bert.tokenization import BertTokenizer
-from pytorch_pretrained_bert.modeling import BertForSequenceClassification
-from time import clock
+# import torch
+# from time import clock
 
-from .hate_speech_classifier import predict_ml_hs
+from . import hate_speech_classifier
 
-# configuration
-ROOT_FOLDER = os.path.dirname(__file__)
-DIRECTORIES = {
-                'ml_hate_speech_path': os.path.join(ROOT_FOLDER, 'models/ml_hate_speech_classifier')
-               }
-
-LOG_FILENAME = os.path.join(ROOT_FOLDER, 'logs/log.txt')
-USER_INPUT_CLASSIFICATION = os.path.join(ROOT_FOLDER, 'logs/user_input_classification.txt')
 
 # namespaces
 ns_multilingual_hate = api.namespace('ml_hate_speech', description='Multilingual hate speech classifiers.')
@@ -63,26 +53,8 @@ hate_model = api.model('hate_speech_model',
                        {'tweet': fields.List(fields.String())}, description="Tweets for classification")
 
 
-
-# Load a trained model that you have fine-tuned
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-bert_model = 'bert-base-multilingual-uncased'
-model_file = os.path.join(DIRECTORIES['ml_hate_speech_path'], 'pytorch_model_epoch_20_seqlen_256.bin')
-
-
-print(os.path.isfile(model_file))
-if not os.path.isfile(model_file):
-    print('Downloading model ...')
-    os.system('sh ./models/ml_hate_speech_classifier/model_download.sh')
-print(model_file)
-if torch.cuda.is_available():
-    model_state_dict = torch.load(model_file)
-else:
-    model_state_dict = torch.load(model_file, map_location='cpu')
-model = BertForSequenceClassification.from_pretrained(bert_model, state_dict=model_state_dict, num_labels=2)
-model.to(device)
-tokenizer = BertTokenizer.from_pretrained(bert_model, do_lower_case=True)
-
+model_class = hate_speech_classifier.ModelLoad()
+model, tokenizer = model_class.load_models()
 
 
 @ns_multilingual_hate.route('/ml_bert')
@@ -91,24 +63,23 @@ class PredictMLHateSpeech(Resource):
 
     @api.doc(responses={200: 'Success', 400: 'Input Error', 500: 'Internal Server Error'})
     @api.expect(hate_model, validate=True)
+
     def post(self):
         """
         Multilingual model that classifies offensive tweets as offensive (OFF) or not (NOT).
         """
-        t0 = clock()
+        # t0 = clock()
         data = request.json['tweet']
-        # print(data)
-        # print(type(data))
 
         try:
-            predictions, certainties = predict_ml_hs(data, tokenizer, model, device)
+            predictions, certainties = hate_speech_classifier.predict_ml_hs(data, tokenizer, model, model_class.device)
             response = []
 
             for prediction, certainty in zip(predictions, certainties):
                 temp_dict = {'Label': prediction, 'Certainty': certainty}
                 response.append(temp_dict)
-            t = clock() - t0
-            print("Exec. time: %f" % t)
+            # t = clock() - t0
+            # print("Exec. time: %f" % t)
             return response
         except Exception as e:
             error_message = "PredictMLHateSpeech: " + str(e)

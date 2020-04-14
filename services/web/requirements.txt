@@ -14,6 +14,8 @@ flask-restplus==0.12.1
 Flask-WTF==0.14.2
 
 
+gensim
+
 nltk
 
 tqdm
