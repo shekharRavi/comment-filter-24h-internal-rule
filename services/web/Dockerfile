@@ -9,8 +9,17 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # install system dependencies
-RUN apt-get update && apt-get install -y netcat
+RUN apt-get update && apt-get install -y netcat && \
+    apt-get install -y wget
 #git
+
+
+
+# Download model
+# RUN wget https://www.dropbox.com/s/2r5s5hbovt9ig7y/pytorch_model_epoch_20_seqlen_256.bin
+# RUN wget -O ./project/models/ml_hate_speech_classifier/pytorch_model_epoch_20_seqlen_256.bin  https://www.dropbox.com/s/2r5s5hbovt9ig7y/pytorch_model_epoch_20_seqlen_256.bin
+
+RUN  echo $PWD
 
 # install dependencies
 RUN pip install --upgrade pip

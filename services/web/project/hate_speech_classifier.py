@@ -39,6 +39,7 @@ from torch.utils.data import TensorDataset, DataLoader, RandomSampler, Sequentia
 
 
 from pytorch_pretrained_bert.tokenization import BertTokenizer
+from pytorch_pretrained_bert import  BertConfig
 from pytorch_pretrained_bert.modeling import BertForSequenceClassification
 
 
@@ -52,9 +53,11 @@ class ModelLoad():
 
     def __init__(self):
         # configuration
-        ROOT_FOLDER = os.path.dirname(__file__)
+        self.ROOT_FOLDER = os.path.dirname(__file__)
+
+        print('ROOT_FOLDER',self.ROOT_FOLDER)
         DIRECTORIES = {
-            'ml_hate_speech_path': os.path.join(ROOT_FOLDER, 'models/ml_hate_speech_classifier')
+            'ml_hate_speech_path': os.path.join(self.ROOT_FOLDER, 'models/ml_hate_speech_classifier')
         }
 
         # Load a trained model that you have fine-tuned
@@ -62,23 +65,55 @@ class ModelLoad():
         self.bert_model = 'bert-base-multilingual-uncased'
         self.model_file = os.path.join(DIRECTORIES['ml_hate_speech_path'], 'pytorch_model_epoch_20_seqlen_256.bin')
 
+        # self.model_file =  'pytorch_model_epoch_20_seqlen_256.bin'
+
         print(os.path.isfile(self.model_file))
         if not os.path.isfile(self.model_file):
-            print('Downloading model ...')
-            os.system('sh ./models/ml_hate_speech_classifier/model_download.sh')
-        print(self.model_file)
-
-    def load_models(self):
+            print('Please Download the model ...')
+            exit(0)
+        #
+        #     model_download_file = "sh " + self.ROOT_FOLDER+'/model_download.sh'
+        #     os.system('ls /usr/src/app/project/')
+        #     print('model_download_file ',model_download_file, os.path.isfile(model_download_file))
+        #     os.system(model_download_file)
+        # print(self.model_file)
 
         if torch.cuda.is_available():
             model_state_dict = torch.load(self.model_file)
         else:
+            print('Loading model ...', self.model_file)
             model_state_dict = torch.load(self.model_file, map_location='cpu')
-        model = BertForSequenceClassification.from_pretrained(self.bert_model, state_dict=model_state_dict, num_labels=2)
-        model.to(self.device)
-        tokenizer = BertTokenizer.from_pretrained(self.bert_model, do_lower_case=True)
 
-        return model,tokenizer
+        tokenizer_file=DIRECTORIES['ml_hate_speech_path']+'/'+self.bert_model+'/vocab.txt'
+        config_file = DIRECTORIES['ml_hate_speech_path']+'/'+self.bert_model+'/bert_config.json'
+        bert_model_file =DIRECTORIES['ml_hate_speech_path']+'/'+self.bert_model+'/'#+'-pytorch_model.bin'
+
+        self.tokenizer = BertTokenizer.from_pretrained(tokenizer_file)
+        config = BertConfig.from_json_file(config_file)
+
+
+        self.model = BertForSequenceClassification.from_pretrained(bert_model_file, state_dict=model_state_dict,
+                                                              num_labels=2)
+
+
+        # self.model = BertForSequenceClassification.from_pretrained(self.bert_model, state_dict=model_state_dict,
+        #                                                       num_labels=2)
+        self.model.to(self.device)
+        # self.tokenizer = BertTokenizer.from_pretrained(self.bert_model, do_lower_case=True)
+
+    def load_models(self):
+
+        # if torch.cuda.is_available():
+        #     model_state_dict = torch.load(self.model_file)
+        # else:
+        #     print('Loading model ...', self.model_file)
+        #     model_state_dict = torch.load(self.model_file, map_location='cpu')
+        # self.model = BertForSequenceClassification.from_pretrained(self.bert_model, state_dict=model_state_dict,
+        #                                                       num_labels=2)
+        # self.model.to(self.device)
+        # self.tokenizer = BertTokenizer.from_pretrained(self.bert_model, do_lower_case=True)
+
+        return self.model,self.tokenizer
 
 class InputExample(object):
     """A single training/test example for simple sequence classification."""
