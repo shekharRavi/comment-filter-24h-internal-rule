@@ -6,12 +6,6 @@ This repository is based on [flask-rest-docker](https://github.com/vidpodpecan/f
 ### Requirements
 -  docker
 -  docker-compose
--  Pre-trained model, download by running following from root directory
-```sh
-
-sh ./services/web/project/models/model_download.sh
-
-```
 
 ### How to use
 
@@ -26,15 +20,6 @@ In short, you need to:
 2. Implement the actual function in `services/web/project/hate_speech_classifier.py`. If the function is asynchronous, write also a handler in `services/celery-queue/tasks.py`. Results of asynchronous functions are stored in Redis which is configured to be persistent.
 
 #### Development
-
-
-First download the pre-trained model from root directory 
-
-```sh
-
-sh ./services/web/project/models/model_download.sh
-
-```
 
 
 The following command
@@ -59,3 +44,15 @@ $ docker-compose -f docker-compose.prod.yml up -d --build
 ```
 
 will build the images and run the containers. The web interface is now available at [http://localhost](http://localhost) and the Flower monitor at [http://localhost:5555](http://localhost:5555). If you change the source code, you will have to do a rebuild for changes to take effect.
+
+#### Pre-trained classifier models
+
+
+The classifiers require pre-trained models. On running the containers, a script will check for their existence and download them if missing. If you have trouble with this, try running this process manually:
+
+```sh
+
+sh ./services/web/project/models/model_download.sh
+
+```
+
