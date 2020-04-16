@@ -1,7 +1,7 @@
 ## Dockerized REST API for news comment filtering
 
 
-This repository is based on [flask-rest-docker](https://github.com/vidpodpecan/flask-rest-docker) which provides the basic dockerized Flask REST API skeleton.
+This repository is based on [flask-rest-docker](https://github.com/vpodpecan/flask-rest-docker) which provides the basic dockerized Flask REST API skeleton.
 
 ### Requirements
 -  docker
