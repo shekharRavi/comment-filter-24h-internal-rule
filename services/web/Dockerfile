@@ -24,7 +24,7 @@ RUN \
 #RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip
 COPY ./requirements.txt ${workDir}/
-RUN pip \
+RUN \
 #RUN --mount=type=cache,target=/root/.cache/pip \
     pip install -r requirements.txt
 
