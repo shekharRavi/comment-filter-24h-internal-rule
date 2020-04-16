@@ -67,6 +67,9 @@ class ModelLoad():
 
         # self.model_file =  'pytorch_model_epoch_20_seqlen_256.bin'
 
+        print('model_file',self.model_file)
+        print('model_dir',os.listdir(os.path.join(self.ROOT_FOLDER, 'models')))
+        print('model_dir_s',os.listdir(DIRECTORIES['ml_hate_speech_path']))
         print(os.path.isfile(self.model_file))
         if not os.path.isfile(self.model_file):
             print('Please Download the model ...')

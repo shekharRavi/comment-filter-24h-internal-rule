@@ -1,7 +1,7 @@
-## Flask REST API skeleton with dockerized Flask + flask_restx, Postgres, SQLAlchemy, Gunicorn, Nginx, Celery, Flower and Redis
+## Dockerized REST API for news comment filtering
 
 
-This repository extends [flask-on-docker](https://github.com/testdrivenio/flask-on-docker) with Celery, Redis and Flask_restx to provide a skeleton for building dockerized Flask RESTful APIs.
+This repository is based on [flask-rest-docker](https://github.com/vidpodpecan/flask-rest-docker) which provides the basic dockerized Flask REST API skeleton.
 
 ### Requirements
 -  docker
