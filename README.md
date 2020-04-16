@@ -6,6 +6,12 @@ This repository extends [flask-on-docker](https://github.com/testdrivenio/flask-
 ### Requirements
 -  docker
 -  docker-compose
+-  Pre-trained model, download by running following from root directory
+```sh
+
+sh ./services/web/project/models/model_download.sh
+
+```
 
 ### How to use
 
@@ -17,12 +23,12 @@ The skeleton provides few examples of synchronous and asynchronous functions whi
 In short, you need to:
 
 1.  Define the API call in `services/web/project/__init__.py` by writing a `Resource` class with the appropriate methods (e.g., get and post), decorate the class and the methods to get automated documentation and testing.
-2. Implement the actual function in `services/web/project/api_functions.py`. If the function is asynchronous, write also a handler in `services/celery-queue/tasks.py`. Results of asynchronous functions are stored in Redis which is configured to be persistent.
+2. Implement the actual function in `services/web/project/hate_speech_classifier.py`. If the function is asynchronous, write also a handler in `services/celery-queue/tasks.py`. Results of asynchronous functions are stored in Redis which is configured to be persistent.
 
 #### Development
 
 
-Firt download the pre-trained model from root directory 
+First download the pre-trained model from root directory 
 
 ```sh
 
