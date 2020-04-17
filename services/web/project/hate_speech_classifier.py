@@ -118,6 +118,16 @@ class ModelLoad():
 
         return self.model,self.tokenizer
 
+    def get_model(self):
+        return self.model
+
+    def get_tokenizer(self):
+        return self.tokenizer
+
+    def get_device(self):
+        return self.device
+    
+
 class InputExample(object):
     """A single training/test example for simple sequence classification."""
 
@@ -138,7 +148,7 @@ class InputExample(object):
         self.text_b = text_b
         self.label = label
 
-
+        
 class InputFeatures(object):
     """A single set of features of data."""
 
@@ -438,6 +448,21 @@ def predict_ml_hs(data, tokenizer, model, device):
     return preds_class, all_certainities
 
 
+model_load = None
+        
+def predict(data):
+    global model_load
+    if model_load is None:
+        model_load = ModelLoad()
+    try:
+        return predict_ml_hs(data, model_load.get_tokenizer(), model_load.get_model(), model_load.get_device())
+    except Exception as e:
+        error_message = "PredictMLHateSpeech: " + str(e)
+        print(error_message)
+        response = {'error': 'internal server error'}
+        return response, 500
+
+        
 #if __name__ == "__main__":
 #    main()
 

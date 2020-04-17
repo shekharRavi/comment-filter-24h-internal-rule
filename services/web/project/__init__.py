@@ -20,7 +20,8 @@ from flask_restx import Api, Resource, fields, abort, reqparse
 from celery import Celery
 import celery.states as states
 
-# from . import api_functions
+from . import api_functions
+from . import hate_speech_classifier
 
 
 # global variables
@@ -35,114 +36,61 @@ db = SQLAlchemy(app)
 api = Api(app, version='1.0',
           title='API services',
           description='dockerized flask+flask_restx+gunicorn+celery+redis+postgres+nginx skeleton for REST APIs')
-# ns = api.namespace('rest_api', description='REST services API')
-# app.run(debug=True)
-
-# ================================================================================================================================
-# import torch
-# from time import clock
-
-from . import hate_speech_classifier
+ns = api.namespace('comments_api', description='REST services API for news comments')
 
 
-# namespaces
-ns_multilingual_hate = api.namespace('ml_hate_speech', description='Multilingual hate speech classifiers.')
+# input and output definitions
 
-# argument models
-hate_model = api.model('hate_speech_model',
-                       {'tweet': fields.List(fields.String())}, description="Tweets for classification")
+hate_speech_single_input = api.model('HateSpeechSingleInput', {
+    'text': fields.String(required=True, description='input text for classification')
+})
+hate_speech_single_output = api.model('HateSpeechSingleOutput', {
+    'label': fields.String(required=True, description='predicted class'),
+    'confidence': fields.Float(required=True, description='prediction confidence')
+})
 
+hate_speech_list_input = api.model('HateSpeechListInput', {
+    'texts': fields.List(fields.String, required=True, description='input list of texts for classification')
+})
+hate_speech_list_output = api.model('HateSpeechListOutput', {
+    'labels': fields.List(fields.String, required=True, description='list of predicted classes'),
+    'confidences': fields.List(fields.Float, required=True, description='list of prediction confidences')
+})
 
-model_class = hate_speech_classifier.ModelLoad()
-model, tokenizer = model_class.load_models()
-
-
-@ns_multilingual_hate.route('/ml_bert')
-class PredictMLHateSpeech(Resource):
-    """Accepts the data, invokes the model and returns the labels."""
-
-    @api.doc(responses={200: 'Success', 400: 'Input Error', 500: 'Internal Server Error'})
-    @api.expect(hate_model, validate=True)
-
+@ns.route('/hate_speech')
+class HateSpeechClassifier(Resource):
+    @ns.doc('predict hate speech from single text')
+    @ns.expect(hate_speech_single_input, validate=True)
+    @ns.marshal_with(hate_speech_single_output)
     def post(self):
-        """
-        Multilingual model that classifies offensive tweets as offensive (OFF) or not (NOT).
-        """
-        # t0 = clock()
-        data = request.json['tweet']
+        label, confidence = hate_speech_classifier.predict([api.payload['text']])
+        return {'label': label[0],
+                'confidence': confidence[0]}
 
-        try:
-            predictions, certainties = hate_speech_classifier.predict_ml_hs(data, tokenizer, model, model_class.device)
-            response = []
+#    @api.doc(responses={200: 'Success', 400: 'Input Error', 500: 'Internal Server Error'})
+#    @api.expect(hate_model, validate=True)
 
-            for prediction, certainty in zip(predictions, certainties):
-                temp_dict = {'Label': prediction, 'Certainty': certainty}
-                response.append(temp_dict)
-            # t = clock() - t0
-            # print("Exec. time: %f" % t)
-            return response
-        except Exception as e:
-            error_message = "PredictMLHateSpeech: " + str(e)
-            print(error_message)
-            response = {'error': 'internal server error'}
-            return response, 500
+
+@ns.route('/hate_speech_list')
+class HateSpeechListClassifier(Resource):
+    @ns.doc('predict hate speech from list of texts')
+    @ns.expect(hate_speech_list_input, validate=True)
+    @ns.marshal_with(hate_speech_list_output)
+    def post(self):
+        labels, confidences = hate_speech_classifier.predict(api.payload['texts'])
+        return {'labels': labels,
+                'confidences': confidences}
+
+
+@app.route("/health")
+def health():
+    return api_functions.health()
+
+@app.route("/documentation")
+def documentation():
+    return api_functions.documentation()
+
 # ==========================================================================================================================================================================
-# # input and output definitions
-# tokenizer_input = api.model('TokenizerInput', {
-#     'text': fields.String(required=True, description='input text')
-# })
-# tokenizer_output = api.model('TokenizerOutput', {
-#     'tokens': fields.List(fields.String, description='tokens')
-# })
-#
-# doc_tokenizer_input = api.model('DocTokenizerInput', {
-#     'texts': fields.List(fields.String, required=True, description='list of texts')
-# })
-# doc_tokenizer_output = api.model('DocTokenizerOutput', {
-#     'tokenized_texts': fields.List(fields.List(fields.String), description='tokens')
-# })
-#
-# # async
-# check_task_input = api.model('CheckTaskInput', {
-#     'task_id': fields.String(required=True, description='task ID')
-# })
-# check_task_output = api.model('CheckTaskOutput', {
-#     'state': fields.String(description='task state'),
-# })
-#
-# get_task_result_input = api.model('GetTaskResultInput', {
-#     'task_id': fields.String(required=True, description='task ID')
-# })
-# get_task_result_output = api.model('GetTaskResultOutput', {
-#     'result': fields.String(description='result as JSON string')
-# })
-#
-# async_translate_input = api.model('AsyncTranslateInput', {
-#     'text': fields.String(required=True, description='text to translate'),
-#     'target_lang': fields.String(required=True, description='target language')
-# })
-# async_translate_output = api.model('AsyncTranslateOutput', {
-#     'task_id': fields.String(description='task ID')
-# })
-#
-#
-# @ns.route('/tokenize_text')
-# class TextTokenizer(Resource):
-#     @ns.doc('tokenizes input text')
-#     @ns.expect(tokenizer_input, validate=True)
-#     @ns.marshal_with(tokenizer_output)
-#     def post(self):
-#         return {'tokens': api_functions.tokenize_text(api.payload['text'])}
-#
-#
-# @ns.route('/tokenize_docs')
-# class DocsTokenizer(Resource):
-#     @ns.doc('tokenizes a list of texts')
-#     @ns.expect(doc_tokenizer_input, validate=True)
-#     @ns.marshal_with(doc_tokenizer_output)
-#     def post(self):
-#         return {'tokenized_texts': api_functions.tokenize_documents(api.payload['texts'])}
-#
 #
 # @ns.route('/check_task')
 # class CheckTask(Resource):

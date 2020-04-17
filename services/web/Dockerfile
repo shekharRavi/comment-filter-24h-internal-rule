@@ -11,12 +11,13 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # install system dependencies
-#RUN --mount=type=cache,target=/root/.cache/apt \
 RUN \
+#RUN --mount=type=cache,target=/root/.cache/apt \
     apt-get update && \
     apt-get install -y netcat && \
     apt-get install -y wget && \
-    apt-get install -y unzip
+    apt-get install -y unzip && \
+    apt-get install -y gcc
 #git
 
 # install dependencies
