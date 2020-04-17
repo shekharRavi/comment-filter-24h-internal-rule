@@ -1,8 +1,10 @@
 from flask.cli import FlaskGroup
+from flask_cors import CORS
 
 import psycopg2
 from project import app, db
 
+CORS(app)
 
 cli = FlaskGroup(app)
 
