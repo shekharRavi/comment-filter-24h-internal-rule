@@ -34,8 +34,8 @@ app.wsgi_app = ProxyFix(app.wsgi_app)
 app.config.from_object("project.config.Config")
 db = SQLAlchemy(app)
 api = Api(app, version='1.0',
-          title='API services',
-          description='dockerized flask+flask_restx+gunicorn+celery+redis+postgres+nginx skeleton for REST APIs')
+          title='UGC API services',
+          description='REST APIs for processing user-generated content')
 ns = api.namespace('comments_api', description='REST services API for news comments')
 
 
@@ -57,7 +57,7 @@ hate_speech_list_output = api.model('HateSpeechListOutput', {
     'confidences': fields.List(fields.Float, required=True, description='list of prediction confidences')
 })
 
-@ns.route('/hate_speech')
+@ns.route('/hate_speech/')
 class HateSpeechClassifier(Resource):
     @ns.doc('predict hate speech from single text')
     @ns.expect(hate_speech_single_input, validate=True)
@@ -71,7 +71,7 @@ class HateSpeechClassifier(Resource):
 #    @api.expect(hate_model, validate=True)
 
 
-@ns.route('/hate_speech_list')
+@ns.route('/hate_speech_list/')
 class HateSpeechListClassifier(Resource):
     @ns.doc('predict hate speech from list of texts')
     @ns.expect(hate_speech_list_input, validate=True)
@@ -82,11 +82,11 @@ class HateSpeechListClassifier(Resource):
                 'confidences': confidences}
 
 
-@app.route("/health")
+@app.route("/health/")
 def health():
     return api_functions.health()
 
-@app.route("/documentation")
+@app.route("/documentation/")
 def documentation():
     return api_functions.documentation()
 
