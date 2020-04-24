@@ -1,5 +1,8 @@
 import shutil
 import psutil
+
+from flask import redirect
+
 #from rest_framework.response import Response
 
 # class MLPHealthView(generics.GenericAPIView):
@@ -69,4 +72,4 @@ def health():
     #return Response(mlp_health, status=status.HTTP_200_OK)
 
 def documentation():
-    return "TBD"
+    return redirect('/swagger.json')

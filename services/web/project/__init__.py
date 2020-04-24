@@ -83,10 +83,12 @@ class HateSpeechListClassifier(Resource):
 
 
 @app.route("/health/")
+#@app.doc('get information about the health of this API')
 def health():
     return api_functions.health()
 
 @app.route("/documentation/")
+#@app.doc('get Swagger documentation about this API')
 def documentation():
     return api_functions.documentation()
 
