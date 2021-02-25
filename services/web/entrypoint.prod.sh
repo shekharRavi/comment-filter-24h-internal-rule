@@ -1,5 +1,9 @@
 #!/bin/sh
 
+echo "Checking for classifier model files..."
+#MODEL_DIR=./project/models
+sh ./project/model_download.sh
+
 if [ "$DATABASE" = "postgres" ]
 then
     echo "Waiting for postgres..."
