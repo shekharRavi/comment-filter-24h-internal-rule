@@ -22,25 +22,15 @@ from __future__ import print_function
 import csv
 import os
 import logging
-#import argparse
-#import random
+
 from tqdm import tqdm, trange
 
 import numpy as np
 import torch
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
-#from torch.utils.data.distributed import DistributedSampler
-
-#from pytorch_pretrained_bert.tokenization import BertTokenizer
-#from pytorch_pretrained_bert.modeling import BertForSequenceClassification
-#from pytorch_pretrained_bert.optimization import BertAdam
-#from pytorch_pretrained_bert.file_utils import PYTORCH_PRETRAINED_BERT_CACHE
-#from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
 
-from pytorch_pretrained_bert.tokenization import BertTokenizer
-from pytorch_pretrained_bert import  BertConfig
-from pytorch_pretrained_bert.modeling import BertForSequenceClassification
+from transformers import BertTokenizer, BertConfig, BertForSequenceClassification
 
 
 logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
@@ -56,16 +46,16 @@ class ModelLoad():
         self.ROOT_FOLDER = os.path.dirname(__file__)
 
         print('ROOT_FOLDER',self.ROOT_FOLDER)
-        DIRECTORIES = {
-            'ml_hate_speech_path': os.path.join(self.ROOT_FOLDER, 'models/ml_hate_speech_classifier')
-        }
+
 
         # Load a trained model that you have fine-tuned
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.bert_model = 'bert-base-multilingual-uncased'
-        self.model_file = os.path.join(DIRECTORIES['ml_hate_speech_path'], 'pytorch_model_epoch_20_seqlen_256.bin')
+        self.bert_model = 'EMBEDDIA/crosloengual-bert' #EMBEDDIA Model
 
-        # self.model_file =  'pytorch_model_epoch_20_seqlen_256.bin'
+        DIRECTORIES = {
+            'ml_hate_speech_path': os.path.join(self.ROOT_FOLDER, 'models/ml_hate_speech_classifier', self.bert_model)
+        }
+        self.model_file = os.path.join(DIRECTORIES['ml_hate_speech_path'], 'pytorch_model.bin')
 
         print('model_file',self.model_file)
         print('model_dir',os.listdir(os.path.join(self.ROOT_FOLDER, 'models')))
@@ -74,47 +64,31 @@ class ModelLoad():
         if not os.path.isfile(self.model_file):
             print('Please Download the model ...')
             exit(0)
-        #
-        #     model_download_file = "sh " + self.ROOT_FOLDER+'/model_download.sh'
-        #     os.system('ls /usr/src/app/project/')
-        #     print('model_download_file ',model_download_file, os.path.isfile(model_download_file))
-        #     os.system(model_download_file)
-        # print(self.model_file)
-
-        if torch.cuda.is_available():
-            model_state_dict = torch.load(self.model_file)
-        else:
-            print('Loading model ...', self.model_file)
-            model_state_dict = torch.load(self.model_file, map_location='cpu')
-
-        tokenizer_file=DIRECTORIES['ml_hate_speech_path']+'/'+self.bert_model+'/vocab.txt'
-        config_file = DIRECTORIES['ml_hate_speech_path']+'/'+self.bert_model+'/bert_config.json'
-        bert_model_file =DIRECTORIES['ml_hate_speech_path']+'/'+self.bert_model+'/'#+'-pytorch_model.bin'
-
-        self.tokenizer = BertTokenizer.from_pretrained(tokenizer_file)
-        config = BertConfig.from_json_file(config_file)
-
-
-        self.model = BertForSequenceClassification.from_pretrained(bert_model_file, state_dict=model_state_dict,
-                                                              num_labels=2)
-
-
-        # self.model = BertForSequenceClassification.from_pretrained(self.bert_model, state_dict=model_state_dict,
-        #                                                       num_labels=2)
-        self.model.to(self.device)
-        # self.tokenizer = BertTokenizer.from_pretrained(self.bert_model, do_lower_case=True)
-
-    def load_models(self):
 
         # if torch.cuda.is_available():
         #     model_state_dict = torch.load(self.model_file)
         # else:
         #     print('Loading model ...', self.model_file)
-        #     model_state_dict = torch.load(self.model_file, map_location='cpu')
-        # self.model = BertForSequenceClassification.from_pretrained(self.bert_model, state_dict=model_state_dict,
-        #                                                       num_labels=2)
-        # self.model.to(self.device)
-        # self.tokenizer = BertTokenizer.from_pretrained(self.bert_model, do_lower_case=True)
+        #     # model_state_dict = torch.load(self.model_file, map_location='cpu')
+
+        # tokenizer_file=DIRECTORIES['ml_hate_speech_path']+'/'+self.bert_model+'/vocab.txt'
+
+        config_file = DIRECTORIES['ml_hate_speech_path']+'/config.json'
+        token_file = DIRECTORIES['ml_hate_speech_path']+'/vocab.txt'
+        #bert_model_file =DIRECTORIES['ml_hate_speech_path']+'/'+self.bert_model+'/'+'pytorch_model.bin'
+        config = BertConfig.from_json_file(config_file)
+        self.tokenizer = BertTokenizer.from_pretrained(token_file, do_lower_case=False)
+
+        print('Loading model ...', self.model_file)
+        self.model = BertForSequenceClassification.from_pretrained(self.model_file, config=config)
+
+        self.model.to(self.device)
+
+        # print(self.model)
+
+    def load_models(self):
+
+        #Return Model
 
         return self.model,self.tokenizer
 
@@ -424,8 +398,12 @@ def predict_ml_hs(data, tokenizer, model, device):
         segment_ids = segment_ids.to(device)
 
         with torch.no_grad():
-            logits = model(input_ids, segment_ids, input_mask)
+            # print(input_ids,segment_ids)
+            outputs = model(input_ids, token_type_ids=None, attention_mask=input_mask)
+            logits = outputs[0]
 
+        print(logits)
+        print(type(logits))
         softmax = torch.nn.Softmax(dim=1)
         logits = softmax(logits)
         all_logits.extend(logits)
@@ -445,6 +423,9 @@ def predict_ml_hs(data, tokenizer, model, device):
         pred = 'OFF' if str(all_preds[i]) == '0' else 'NOT'
         preds_class.append(pred)
 
+    print(preds_class, all_certainities)
+    print(type(preds_class), type(all_certainities))
+
     return preds_class, all_certainities
 
 
@@ -454,17 +435,20 @@ def predict(data):
     global model_load
     if model_load is None:
         model_load = ModelLoad()
-    try:
-        return predict_ml_hs(data, model_load.get_tokenizer(), model_load.get_model(), model_load.get_device())
-    except Exception as e:
-        error_message = "PredictMLHateSpeech: " + str(e)
-        print(error_message)
-        response = {'error': 'internal server error'}
-        return response, 500
+
+    return predict_ml_hs(data, model_load.get_tokenizer(), model_load.get_model(), model_load.get_device())
+
+    # try:
+    #     return predict_ml_hs(data, model_load.get_tokenizer(), model_load.get_model(), model_load.get_device())
+    # except Exception as e:
+    #     error_message = "PredictMLHateSpeech: " + str(e)
+    #     print(error_message)
+    #     response = {'error': 'internal server error'}
+    #     return response, 500
 
         
-#if __name__ == "__main__":
-#    main()
+# if __name__ == "__main__":
+#    predict(["Chwekc model","fuck off"])
 
 #semeval
 #01/13/2019 21:40:38 - INFO - __main__ -     eval_accuracy = 0.796149490373726
