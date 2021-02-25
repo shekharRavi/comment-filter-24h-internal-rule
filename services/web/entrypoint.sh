@@ -1,8 +1,8 @@
 #!/bin/sh
 
 echo "Checking for classifier model files..."
-MODEL_DIR=./project/models
-sh $MODEL_DIR/model_download.sh
+#MODEL_DIR=./project/models
+sh ./project/model_download.sh
 
 if [ "$DATABASE" = "postgres" ]
 then
