@@ -11,9 +11,9 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # install system dependencies
-RUN \
+
 #RUN --mount=type=cache,target=/root/.cache/apt \
-    apt-get update && \
+RUN  apt-get update && \
     apt-get install -y netcat && \
     apt-get install -y wget && \
     apt-get install -y unzip && \
@@ -21,13 +21,13 @@ RUN \
 #git
 
 # install dependencies
-RUN \
+
 #RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --upgrade pip
+RUN    pip install --upgrade pip
 COPY ./requirements.txt ${workDir}/
-RUN \
+
 #RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install -r requirements.txt
+RUN    pip install -r requirements.txt
 
 # copy project
 COPY . ${workDir}/
