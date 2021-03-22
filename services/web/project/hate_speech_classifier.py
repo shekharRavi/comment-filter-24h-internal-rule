@@ -22,12 +22,11 @@ from __future__ import print_function
 import csv
 import os
 import logging
-
-from tqdm import tqdm, trange
+import pickle
 
 import numpy as np
 import torch
-from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
+from torch.utils.data import TensorDataset, DataLoader,  SequentialSampler
 
 
 from transformers import BertTokenizer, BertConfig, BertForSequenceClassification
@@ -56,6 +55,7 @@ class ModelLoad():
             'ml_hate_speech_path': os.path.join(self.ROOT_FOLDER, 'models/ml_hate_speech_classifier', self.bert_model)
         }
         self.model_file = os.path.join(DIRECTORIES['ml_hate_speech_path'], 'pytorch_model.bin')
+        self.model_file_nb = os.path.join(DIRECTORIES['ml_hate_speech_path'], 'nb_model_bigram.sav')
 
         print('model_file',self.model_file)
         print('model_dir',os.listdir(os.path.join(self.ROOT_FOLDER, 'models')))
@@ -65,26 +65,21 @@ class ModelLoad():
             print('Please Download the model ...')
             exit(0)
 
-        # if torch.cuda.is_available():
-        #     model_state_dict = torch.load(self.model_file)
-        # else:
-        #     print('Loading model ...', self.model_file)
-        #     # model_state_dict = torch.load(self.model_file, map_location='cpu')
-
-        # tokenizer_file=DIRECTORIES['ml_hate_speech_path']+'/'+self.bert_model+'/vocab.txt'
 
         config_file = DIRECTORIES['ml_hate_speech_path']+'/config.json'
         token_file = DIRECTORIES['ml_hate_speech_path']+'/vocab.txt'
-        #bert_model_file =DIRECTORIES['ml_hate_speech_path']+'/'+self.bert_model+'/'+'pytorch_model.bin'
-        config = BertConfig.from_json_file(config_file)
+
+        config = BertConfig.from_pretrained(config_file, num_labels=9)
         self.tokenizer = BertTokenizer.from_pretrained(token_file, do_lower_case=False)
 
         print('Loading model ...', self.model_file)
-        self.model = BertForSequenceClassification.from_pretrained(self.model_file, config=config)
 
+        self.model = BertForSequenceClassification.from_pretrained(self.model_file, config=config)
+        self.model_nb = pickle.load(open(self.model_file_nb, 'rb'))
+
+        self.model.eval()
         self.model.to(self.device)
 
-        # print(self.model)
 
     def load_models(self):
 
@@ -93,7 +88,14 @@ class ModelLoad():
         return self.model,self.tokenizer
 
     def get_model(self):
+        # Return Model
+
         return self.model
+
+    def get_model_nb(self):
+        # Return Model
+
+        return self.model_nb
 
     def get_tokenizer(self):
         return self.tokenizer
@@ -223,14 +225,7 @@ class SemEvalProcessor(DataProcessor):
                 label = "0" if line[1] == 'OFF' else "1"
                 examples.append(
                     InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
-                #if label == '0':
-                #    examples.append(
-                #        InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
-                #else:
-                 #   for i in range(3):
-                  #      examples.append(
-                   #         InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
-
+            
         elif set_type == 'test':
             for (i, line) in enumerate(lines):
                 #if i == 0:
@@ -313,16 +308,7 @@ def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer
         assert len(segment_ids) == max_seq_length
 
         label_id = label_map[example.label]
-        # if ex_index < 5:
-        #     logger.info("*** Example ***")
-        #     logger.info("guid: %s" % (example.guid))
-        #     logger.info("tokens: %s" % " ".join(
-        #             [str(x) for x in tokens]))
-        #     logger.info("input_ids: %s" % " ".join([str(x) for x in input_ids]))
-        #     logger.info("input_mask: %s" % " ".join([str(x) for x in input_mask]))
-        #     logger.info(
-        #             "segment_ids: %s" % " ".join([str(x) for x in segment_ids]))
-        #     logger.info("label: %s (id = %d)" % (example.label, label_id))
+
 
         features.append(
                 InputFeatures(input_ids=input_ids,
@@ -357,12 +343,16 @@ def warmup_linear(x, warmup=0.002):
         return x/warmup
     return 1.0 - x
 
+def predict_nb(text,model_nb):
+    predicted = model_nb.predict(text)
+    predicted_prob = model_nb.predict_probs(text)
+    return  predicted,  predicted_prob
 
-def predict_ml_hs(data, tokenizer, model, device):
+def predict_ml_hs(data, tokenizer, model, model_nb, device):
 
     #local_rank = -1
     max_seq_length = 128
-    eval_batch_size = 32
+    eval_batch_size = 1
     task_name = 'semeval'
     processors = {
         "semeval": SemEvalProcessor,
@@ -370,12 +360,10 @@ def predict_ml_hs(data, tokenizer, model, device):
 
     processor = processors[task_name]()
     test_examples = processor.get_test_examples(data)
-    guids = [example.guid for example in test_examples]
+    # guids = [example.guid for example in test_examples]
     test_features = convert_examples_to_features(
         test_examples, None, max_seq_length, tokenizer)
-    # logger.info("***** Running prediction *****")
-    # logger.info("  Num examples = %d", len(test_examples))
-    # logger.info("  Batch size = %d", eval_batch_size)
+
     all_input_ids = torch.tensor([f.input_ids for f in test_features], dtype=torch.long)
     all_input_mask = torch.tensor([f.input_mask for f in test_features], dtype=torch.long)
     all_segment_ids = torch.tensor([f.segment_ids for f in test_features], dtype=torch.long)
@@ -388,43 +376,58 @@ def predict_ml_hs(data, tokenizer, model, device):
     model.eval()
 
     all_preds = []
-    all_ids = []
     all_certainities = []
-    all_logits = []
 
-    for input_ids, input_mask, segment_ids, label_ids in tqdm(test_dataloader, desc="Predicting"):
-        input_ids = input_ids.to(device)
-        input_mask = input_mask.to(device)
-        segment_ids = segment_ids.to(device)
 
-        with torch.no_grad():
-            # print(input_ids,segment_ids)
-            outputs = model(input_ids, token_type_ids=None, attention_mask=input_mask)
-            logits = outputs[0]
+    ###### NB prediction ###########
+    nb_predicts = model_nb.predict(data)
+    nb_predicts_prob = model_nb.predict_proba(data)
 
-        print(logits)
-        print(type(logits))
-        softmax = torch.nn.Softmax(dim=1)
-        logits = softmax(logits)
-        all_logits.extend(logits)
-        logits = logits.detach().cpu().numpy()
-        preds = np.argmax(logits, axis=1).tolist()
-        certainities = np.amax(logits, axis=1).tolist()
-        input_ids = input_ids.to('cpu').numpy().tolist()
+    counter = 0
+    softmax = torch.nn.Softmax(dim=1)
+
+    for input_ids, input_mask, segment_ids, label_ids in test_dataloader:
+
+        pred = nb_predicts[counter]
+        certainities = nb_predicts_prob[counter]
+        # print(pred, certainities)
+        #Only if NB is not predicting Rule 1.
+        if pred != 1 and certainities[1] < 0.55:
+            input_ids = input_ids.to(device)
+            input_mask = input_mask.to(device)
+
+            with torch.no_grad():
+
+                outputs = model(input_ids, token_type_ids=None, attention_mask=input_mask)
+                logits = outputs[0]
+
+            logits = softmax(logits)
+            logits = logits.detach().cpu().numpy()
+            preds = np.argmax(logits, axis=1).tolist()
+            certainities = np.amax(logits, axis=1).tolist()
+
 
         all_preds.extend(preds)
-        all_ids.extend(input_ids)
         all_certainities.extend(certainities)
 
-    #print(logits)
-    #print(certainities)
+        counter = counter +1
+
     preds_class = []
     for i in range(len(all_preds)):
-        pred = 'OFF' if str(all_preds[i]) == '0' else 'NOT'
+        tmp_pred = all_preds[i]
+        if str(tmp_pred) == '0':
+            pred = 'Non-Blocked'
+        else:
+            try:
+                pred = 'Blocked, Violeting Rule ' + str(tmp_pred[0]) + ' and ' + str(tmp_pred[1])
+            except:
+                pred = 'Blocked, Violeting Rule ' + str(tmp_pred)
+
         preds_class.append(pred)
 
-    print(preds_class, all_certainities)
-    print(type(preds_class), type(all_certainities))
+    for x, y in zip(preds_class,all_certainities):
+        print(x,y)
+
 
     return preds_class, all_certainities
 
@@ -436,22 +439,21 @@ def predict(data):
     if model_load is None:
         model_load = ModelLoad()
 
-    return predict_ml_hs(data, model_load.get_tokenizer(), model_load.get_model(), model_load.get_device())
+    return predict_ml_hs(data, model_load.get_tokenizer(), model_load.get_model(), model_load.get_model_nb(), model_load.get_device())
 
-    # try:
-    #     return predict_ml_hs(data, model_load.get_tokenizer(), model_load.get_model(), model_load.get_device())
-    # except Exception as e:
-    #     error_message = "PredictMLHateSpeech: " + str(e)
-    #     print(error_message)
-    #     response = {'error': 'internal server error'}
-    #     return response, 500
 
         
 # if __name__ == "__main__":
-#    predict(["Chwekc model","fuck off"])
-
-#semeval
-#01/13/2019 21:40:38 - INFO - __main__ -     eval_accuracy = 0.796149490373726
-#01/13/2019 21:40:38 - INFO - __main__ -     eval_loss = 0.5491396050608481
-
-
+#     import pandas as pd
+#     data = pd.read_csv('/Users/ravi/Desktop/codes/hackashop2021_comment_filtering/data/val_24sata.csv')
+#
+#     text = []
+#     c = 1064468
+#
+#     for i, t in enumerate(data[data['infringed_on_rule'] == 1].content.values):
+#         text.append(t)
+#         if i > 100:
+#             break
+#
+#     predict(text)
+    # print(text)
