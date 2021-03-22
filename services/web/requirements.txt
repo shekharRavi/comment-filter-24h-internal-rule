@@ -13,8 +13,8 @@ Flask-RESTful==0.3.7
 flask-restplus==0.12.1
 Flask-WTF==0.14.2
 
-tqdm
 numpy
+sklearn
 
 torch==1.*
 transformers==4.*
