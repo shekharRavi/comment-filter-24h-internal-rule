@@ -3,7 +3,7 @@
 MODEL_DIR=./project/models
 LOCAL_MODEL_ZIP=ml_hate_speech_classifier.zip
 LOCAL_MODEL_DIR=ml_hate_speech_classifier
-REMOTE_MODEL_URL=https://www.dropbox.com/s/fivwekb7kr71x61/ml_hate_speech_classifier.zip
+REMOTE_MODEL_URL=https://www.dropbox.com/s/nj2z2gq5lexigh1/ml_hate_speech_classifier.zip
 
 if [ ! -d $MODEL_DIR ]; then
     mkdir $MODEL_DIR
