@@ -15,7 +15,7 @@ import werkzeug
 werkzeug.cached_property = werkzeug.utils.cached_property
 from werkzeug.utils import secure_filename
 from werkzeug.middleware.proxy_fix import ProxyFix
-from flask_restx import Api, Resource, fields, abort, reqparse
+from flask_restx import Api, Resource, fields, abort, reqparse,marshal
 
 from celery import Celery
 import celery.states as states
@@ -38,6 +38,26 @@ api = Api(app, version='1.0',
           description='REST APIs for processing user-generated content')
 ns = api.namespace('comments_api', description='REST services API for news comments')
 
+class DictItem(fields.Raw):
+    def output(self, key, obj, *args, **kwargs):
+        try:
+            dct = getattr(obj, self.attribute)
+        except AttributeError:
+            return {}
+        return dct or {}
+
+
+details_model = api.model('details', {
+          "PASS": fields.Float( description='PASS confidence'),
+           "RULE-1": fields.Float(description='Rule 1 confidence'),
+            "RULE-2": fields.Float(description='Rule 2 confidence'),
+            "RULE-3": fields.Float( description='Rule 3 confidence'),
+            "RULE-4": fields.Float( description='Rule 4 confidence'),
+            "RULE-5": fields.Float( description='Rule 5 confidence'),
+            "RULE-6": fields.Float( description='Rule 6 confidence'),
+            "RULE-7": fields.Float( description='Rule 7 confidence'),
+            "RULE-8": fields.Float( description='Rule 8 confidence'),
+          })
 
 # input and output definitions
 
@@ -45,16 +65,19 @@ hate_speech_single_input = api.model('HateSpeechSingleInput', {
     'text': fields.String(required=True, description='input text for classification')
 })
 hate_speech_single_output = api.model('HateSpeechSingleOutput', {
-    'label': fields.String(required=True, description='predicted class'),
-    'confidence': fields.Float(required=True, description='prediction confidence')
-})
+    'decision': fields.String(required=True, description='predicted class'),
+    'result': fields.Float(required=True, description='prediction confidence'),
+    "details":fields.Raw(description='All rules probabilities'),
+
+   })
 
 hate_speech_list_input = api.model('HateSpeechListInput', {
     'texts': fields.List(fields.String, required=True, description='input list of texts for classification')
 })
 hate_speech_list_output = api.model('HateSpeechListOutput', {
-    'labels': fields.List(fields.String, required=True, description='list of predicted classes'),
-    'confidences': fields.List(fields.Float, required=True, description='list of prediction confidences')
+    'decision': fields.List(fields.String, required=True, description='list of predicted classes'),
+    'result': fields.List(fields.Float, required=True, description='list of prediction confidences'),
+    "details":fields.List(fields.Raw(), required=True, description='list of All rules probabilities'),
 })
 
 @ns.route('/hate_speech/')
@@ -63,9 +86,14 @@ class HateSpeechClassifier(Resource):
     @ns.expect(hate_speech_single_input, validate=True)
     @ns.marshal_with(hate_speech_single_output)
     def post(self):
-        label, confidence = hate_speech_classifier.predict([api.payload['text']])
-        return {'label': label[0],
-                'confidence': confidence[0]}
+        label, confidence,detail = hate_speech_classifier.predict([api.payload['text']])
+        print(detail)
+        print(marshal(detail, details_model))
+        return {'decision': label[0],
+                'result': confidence[0],
+                "details": marshal(detail, details_model)
+                }
+
 
 #    @api.doc(responses={200: 'Success', 400: 'Input Error', 500: 'Internal Server Error'})
 #    @api.expect(hate_model, validate=True)
@@ -77,9 +105,11 @@ class HateSpeechListClassifier(Resource):
     @ns.expect(hate_speech_list_input, validate=True)
     @ns.marshal_with(hate_speech_list_output)
     def post(self):
-        labels, confidences = hate_speech_classifier.predict(api.payload['texts'])
-        return {'labels': labels,
-                'confidences': confidences}
+        label, confidence,detail = hate_speech_classifier.predict(api.payload['texts'])
+        return {'decision': label,
+                'result': confidence,
+                "details": marshal(detail, details_model)
+                }
 
 
 @app.route("/health/")

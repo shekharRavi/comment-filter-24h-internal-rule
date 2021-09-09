@@ -249,9 +249,8 @@ def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer
 
     features = []
     for (ex_index, example) in enumerate(examples):
-        # print(example.text_a)
+
         tokens_a = tokenizer.tokenize(example.text_a)
-        # print(tokens_a)
 
         tokens_b = None
         if example.text_b:
@@ -360,7 +359,7 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
 
     processor = processors[task_name]()
     test_examples = processor.get_test_examples(data)
-    # guids = [example.guid for example in test_examples]
+
     test_features = convert_examples_to_features(
         test_examples, None, max_seq_length, tokenizer)
 
@@ -377,6 +376,7 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
 
     all_preds = []
     all_certainities = []
+    all_details = []
 
 
     ###### NB prediction ###########
@@ -390,8 +390,9 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
 
         pred = nb_predicts[counter]
         certainities = nb_predicts_prob[counter]
-        # print(pred, certainities)
+
         #Only if NB is not predicting Rule 1.
+        #TODO: Need to remove NB in future, no real benifit
         if pred != 1 and certainities[1] < 0.55:
             input_ids = input_ids.to(device)
             input_mask = input_mask.to(device)
@@ -406,9 +407,21 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
             preds = np.argmax(logits, axis=1).tolist()
             certainities = np.amax(logits, axis=1).tolist()
 
+            details = {}
+
+            for idx in range(0,9):
+                logit = logits[:,idx][0]
+
+                if idx == 0:
+                    details["PASS"]=logit
+                else:
+                    rule = "RULE-"+str(idx)
+                    details[rule]=logit
+
 
         all_preds.extend(preds)
         all_certainities.extend(certainities)
+        all_details.append(details)
 
         counter = counter +1
 
@@ -416,20 +429,12 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
     for i in range(len(all_preds)):
         tmp_pred = all_preds[i]
         if str(tmp_pred) == '0':
-            pred = 'Non-Blocked'
+            pred = 'PASS'
         else:
-            try:
-                pred = 'Blocked, Violeting Rule ' + str(tmp_pred[0]) + ' and ' + str(tmp_pred[1])
-            except:
-                pred = 'Blocked, Violeting Rule ' + str(tmp_pred)
-
+            pred = 'FAIL'
         preds_class.append(pred)
 
-    for x, y in zip(preds_class,all_certainities):
-        print(x,y)
-
-
-    return preds_class, all_certainities
+    return preds_class, all_certainities, all_details
 
 
 model_load = None
@@ -452,8 +457,7 @@ def predict(data):
 #
 #     for i, t in enumerate(data[data['infringed_on_rule'] == 1].content.values):
 #         text.append(t)
-#         if i > 100:
+#         if i > 2:
 #             break
-#
-#     predict(text)
-    # print(text)
+#     label, confidence,detail = predict(text)
+#     print(detail)
