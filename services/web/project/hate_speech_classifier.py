@@ -37,6 +37,7 @@ logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(messa
                     level = logging.INFO)
 logger = logging.getLogger(__name__)
 
+map_24h_internal_rule={"1":"5","2":"1","3":"2","4":"3","5":"4","6":"6","7":"7","8":"8"}
 
 class ModelLoad():
 
@@ -415,7 +416,7 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
                 if idx == 0:
                     details["PASS"]=logit
                 else:
-                    rule = "RULE-"+str(idx)
+                    rule = "RULE-"+map_24h_internal_rule[str(idx)]
                     details[rule]=logit
 
 
