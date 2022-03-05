@@ -37,7 +37,7 @@ logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(messa
                     level = logging.INFO)
 logger = logging.getLogger(__name__)
 
-map_24h_internal_rule={"1":"5","2":"1","3":"2","4":"3","5":"4","6":"6","7":"7","8":"8"}
+map_24h_internal_rule={"0":"0","1":"5","2":"1","3":"2","4":"3","5":"4","6":"6","7":"7","8":"8"}
 
 class ModelLoad():
 
