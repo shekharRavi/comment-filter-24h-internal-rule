@@ -431,6 +431,8 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
 
         counter = counter +1
 
+        print(len(all_preds), len(all_certainities), len(all_details))
+
     preds_class = []
     for i in range(len(all_preds)):
         tmp_pred = all_preds[i]
@@ -439,6 +441,8 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
         else:
             pred = 'FAIL'
         preds_class.append(pred)
+
+    print(len(preds_class), len(all_certainities), len(all_details))
 
     return preds_class, all_certainities, all_details
 
