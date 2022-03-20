@@ -419,9 +419,9 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
                 else:
                     rule = "RULE-"+str(idx)
                     details[rule]=logit
-        else:
-            rule = "RULE-1"
-            details[rule]=logit
+        # else:
+        #     rule = "RULE-1"
+        #     details[rule]=logit
 
 
         all_preds.extend(preds)
