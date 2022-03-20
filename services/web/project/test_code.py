@@ -447,7 +447,41 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
 
     return preds_class, all_certainities, all_details, rule
 
+def get_dataloader(data,batch_size):
+    examples = processor.get_test_examples(data)
 
+    features = convert_examples_to_features(
+        examples, None, max_seq_length, tokenizer)
+
+    all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
+    all_input_mask = torch.tensor([f.input_mask for f in features], dtype=torch.long)
+    all_segment_ids = torch.tensor([f.segment_ids for f in features], dtype=torch.long)
+    all_label_ids = torch.tensor([f.label_id for f in features], dtype=torch.long)
+    test_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
+    # Run prediction for full data
+    test_sampler = SequentialSampler(test_data)
+    data_dataloader = DataLoader(test_data, sampler=test_sampler, batch_size=batch_size)
+
+    return data_dataloader
+def train_ml_hs(train_data,val_data, tokenizer, model, model_nb, device):
+
+    #local_rank = -1
+    max_seq_length = 256
+    batch_size = 8
+    task_name = 'semeval'
+    processors = {
+        "semeval": SemEvalProcessor,
+    }
+
+    processor = processors[task_name]()
+    
+    model.train()
+
+    train_dataloader = get_dataloader(train_data,batch_size)
+    val_dataloader = get_dataloader(val_data,batch_size)
+
+
+    
 model_load = None
         
 def predict(data):
