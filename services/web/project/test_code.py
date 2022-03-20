@@ -43,7 +43,7 @@ class ModelLoad():
 
     def __init__(self):
         # configuration
-        self.ROOT_FOLDER = os.path.dirname(__file__)
+        self.ROOT_FOLDER = '/import/cogsci/ravi/codes/comment-filter-24h-internal-rule/services/web/project/models/ml_hate_speech_classifier/'
 
         print('ROOT_FOLDER',self.ROOT_FOLDER)
 
