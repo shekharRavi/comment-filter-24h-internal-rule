@@ -49,6 +49,8 @@ for idx, rule in enumerate(rules):
 
     # print(rule, len(sel_data), len(save_df))
 print(data)
+train_df['label'] = train_df['infringed_on_rule']
+val_df['label'] = val_df['infringed_on_rule']
 data_df= pd.DataFrame(data.items(), columns=['rule', 'count']) 
 data_df.to_csv('rule_stat_selected.csv', index=False)
 train_df.to_csv('train_rule_selected_24sata.csv', index=False)
