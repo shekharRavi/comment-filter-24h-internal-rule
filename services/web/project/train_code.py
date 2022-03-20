@@ -198,7 +198,7 @@ if __name__ == '__main__':
 
         model = AutoModelForSequenceClassification.from_pretrained(model_dir, num_labels=9, classifier_dropout=0.1)
 
-        trainer = CustomTrainer(
+        trainer = Trainer(
             model=model,  # the instantiated Transformers model to be trained
             args=training_args,  # training arguments, defined above
             train_dataset=train_dataset,  # training dataset
