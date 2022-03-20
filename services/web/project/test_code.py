@@ -461,10 +461,10 @@ def predict(data):
         
 if __name__ == "__main__":
     import pandas as pd
-    data = pd.read_csv('/import/cogsci/ravi/2019_data.csv')
+    data = pd.read_csv('/import/cogsci/ravi/datasets/24sata/csv_embeddia_export.csv')
 
     content = data.content.values.tolist()
-    text = content[:100]
+    text = content
     # c = 1064468
 
     # for i, t in enumerate(data[data['infringed_on_rule'] == 1].content.values):
