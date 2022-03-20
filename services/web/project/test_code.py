@@ -433,6 +433,7 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
         print(len(all_preds), len(all_certainities), len(all_details))
 
     preds_class = []
+    rule = []
     for i in range(len(all_preds)):
         tmp_pred = all_preds[i]
         if str(tmp_pred) == '0':
@@ -440,10 +441,11 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
         else:
             pred = 'FAIL'
         preds_class.append(pred)
+        rule.append(tmp_pred)
 
     print(len(preds_class), len(all_certainities), len(all_details))
 
-    return preds_class, all_certainities, all_details
+    return preds_class, all_certainities, all_details, rule
 
 
 model_load = None
@@ -469,9 +471,9 @@ if __name__ == "__main__":
     #     text.append(t)
     #     if i > 2:
     #         break
-    label, confidence,detail = predict(text)
+    label, confidence,detail, rule = predict(text)
     print(len(text), len(label), len(confidence), len(detail))
-    df = pd.DataFrame({'content':text, 'embeddia_rule':label, 'result':confidence, 'details':detail})
+    df = pd.DataFrame({'content':text, 'block':label,'embeddia_rule':rule, 'result':confidence, 'details':detail})
 
     df.to_csv('output.csv',index=False)
     

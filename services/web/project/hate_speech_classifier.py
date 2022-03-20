@@ -427,6 +427,7 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
         counter = counter +1
 
     preds_class = []
+    # rule = []
     for i in range(len(all_preds)):
         tmp_pred = all_preds[i]
         if str(tmp_pred) == '0':
