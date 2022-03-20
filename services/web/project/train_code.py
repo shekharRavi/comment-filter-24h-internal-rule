@@ -77,8 +77,8 @@ class HRDataset(torch.utils.data.Dataset):
         item = {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
         item['labels'] = torch.tensor(self.labels[idx])
 
-         for key in item.keys():
-             print(key, item[key].shape)
+        for key in item.keys():
+            print(key, item[key].shape)
         return item
 
     def __len__(self):
