@@ -60,7 +60,7 @@ def read_data(file_name):
 
     df = pd.read_csv(file_name, lineterminator='\n')
     df.label = df.label.astype(int)
-    #df = df.head(100)
+    df = df.head(100)
     print('Processing', file_name, df.shape)
     texts= df.content.tolist()
     labels = df.label.tolist()
@@ -139,6 +139,7 @@ if __name__ == '__main__':
     save_steps = args.save_steps
     save_total_limit = args.save_total_limit
     save_strategy = args.save_strategy
+    max_seq_length = 256
 
     dataset = args.dataset
     train_file = datasets[dataset]['train_file']
@@ -154,14 +155,14 @@ if __name__ == '__main__':
     print(model_dirs)
 
     tokenizer = AutoTokenizer.from_pretrained(model_dir)
-    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer, do_lower_case=False)
 
     #TODO: Maybe want to save the dataset, so that processing is less
     train_texts, train_labels = read_data(train_file)
-    train_encodings = tokenizer(train_texts, truncation=True, padding=True)
+    train_encodings = tokenizer(train_texts, truncation=True, padding=True, max_length=max_seq_length)
     train_dataset = HRDataset(train_encodings, train_labels)
     val_texts, val_labels = read_data(val_file)
-    val_encodings = tokenizer(val_texts, truncation=True, padding=True)
+    val_encodings = tokenizer(val_texts, truncation=True, padding=True,max_length=max_seq_length)
     val_dataset = HRDataset(val_encodings, val_labels)
 
     # encoded_dataset.save_to_disk("path/of/my/dataset/directory")
