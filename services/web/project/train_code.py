@@ -41,8 +41,8 @@ def compute_metrics(eval_preds):
     logits, labels = eval_preds
     predictions = np.argmax(logits, axis=-1)
 
-    acc = metric_acc.compute(predictions=predictions, references=labels)
-    f1 = metric_f1.compute(predictions=predictions, references=labels, average="macro")
+    acc = metric_acc.compute(predictions=predictions, references=labels) * 100
+    f1 = metric_f1.compute(predictions=predictions, references=labels, average="macro") * 100
 
     return {"acc": acc, "f1": f1}
 
@@ -60,7 +60,7 @@ def read_data(file_name):
 
     df = pd.read_csv(file_name, lineterminator='\n')
     df.label = df.label.astype(int)
-    df = df.head(100)
+    df = df.head(5000)
     print('Processing', file_name, df.shape)
     texts= df.content.tolist()
     labels = df.label.tolist()
@@ -107,8 +107,8 @@ if __name__ == '__main__':
     parser.add_argument("-output_dir", type=str, default="./results/claasify/", help='Output Directory')
     parser.add_argument("-logging_dir", type=str, default="./logs/claasify/", help='Logging Directory')
     parser.add_argument("-num_train_epochs", type=int, default=5, help='Number of training Epochs')
-    parser.add_argument("-per_device_train_batch_size", type=int, default=8, help='Traiing Batch Size')
-    parser.add_argument("-per_device_eval_batch_size", type=int, default=8, help='Evaluation Batch Size')
+    parser.add_argument("-per_device_train_batch_size", type=int, default=16, help='Traiing Batch Size')
+    parser.add_argument("-per_device_eval_batch_size", type=int, default=16, help='Evaluation Batch Size')
     parser.add_argument("-warmup_steps", type=int, default=500, help='Warmup Steps')
     parser.add_argument("-weight_decay", type=int, default=0.01, help='Weight Decay Rate')
     parser.add_argument("-logging_steps", type=int, default=500, help='Logging Steps')
