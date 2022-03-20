@@ -430,7 +430,7 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
 
         counter = counter +1
 
-        print(len(all_preds), len(all_certainities), len(all_details))
+        # print(len(all_preds), len(all_certainities), len(all_details))
 
     preds_class = []
     rule = []
@@ -443,7 +443,7 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
         preds_class.append(pred)
         rule.append(tmp_pred)
 
-    print(len(preds_class), len(all_certainities), len(all_details))
+    # print(len(preds_class), len(all_certainities), len(all_details))
 
     return preds_class, all_certainities, all_details, rule
 
@@ -464,7 +464,7 @@ if __name__ == "__main__":
     data = pd.read_csv('/import/cogsci/ravi/datasets/24sata/csv_embeddia_export.csv')
 
     content = data.content.values.tolist()
-    text = content
+    text = content[:100]
     # c = 1064468
 
     # for i, t in enumerate(data[data['infringed_on_rule'] == 1].content.values):
