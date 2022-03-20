@@ -28,7 +28,9 @@ for idx, rule in enumerate(rules):
     sel_data = df[df.infringed_on_rule == rule]
     # print('s',rule, len(sel_data), len(save_df))
     if idx == 0:
-        save_df = sel_data
+        train_df = sel_data.sample(frac=0.9)
+        val_df = sel_data.drop(train_df.index)
+
     else:
         if rule in [8,0,1]:
             if len(save_df) < len(sel_data):
@@ -36,7 +38,12 @@ for idx, rule in enumerate(rules):
                 if n < len(sel_data):
                     # print('n.',n, 'sel',len(sel_data))
                     sel_data = sel_data.sample(n = n)
-        save_df = pd.concat([save_df, sel_data])
+        
+        train = sel_data.sample(frac=0.9)
+        val = sel_data.drop(train_df.index)
+        
+        train_df = pd.concat([train_df, train])
+        val_df = pd.concat([val_df, val])
     
     data[rule] = len(sel_data)
 
@@ -44,4 +51,7 @@ for idx, rule in enumerate(rules):
 print(data)
 data_df= pd.DataFrame(data.items(), columns=['rule', 'count']) 
 data_df.to_csv('rule_stat_selected.csv', index=False)
-save_df.to_csv('rule_selected_24sata.csv', index=False)
+train_df.to_csv('train_rule_selected_24sata.csv', index=False)
+val_df.to_csv('val_rule_selected_24sata.csv', index=False)
+
+print(len(train_df), len(val_df))
