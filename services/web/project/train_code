@@ -79,6 +79,21 @@ class HRDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.labels)
 
+class CustomTrainer(Trainer):
+    def __init__(self, class_weights, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # You pass the class weights when instantiating the Trainer
+        self.class_weights = class_weights
+    def compute_loss(self, model, inputs, return_outputs=False):
+        labels = inputs.get("labels")
+        # forward pass
+        outputs = model(**inputs)
+        logits = outputs.get("logits")
+        # compute custom loss (suppose one has 3 labels with different weights)
+        loss_fct = nn.CrossEntropyLoss(weight=self.class_weights)
+        loss = loss_fct(logits.view(-1, self.model.config.num_labels), labels.view(-1))
+        return (loss, outputs) if return_outputs else loss
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
