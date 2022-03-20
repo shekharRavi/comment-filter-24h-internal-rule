@@ -26,7 +26,7 @@ model_cards = {
 
 datasets = {
 'rule':{
-        'train_file':'/import/cogsci/ravi/datasets/24sata/train_rule_selected_24sata.csv',
+        'train_file':'/import/cogsci/ravi/datasets/24sata/val_rule_selected_24sata.csv',
         'val_file':'/import/cogsci/ravi/datasets/24sata/val_rule_selected_24sata.csv',
         'test_file':'/import/cogsci/ravi/datasets/24sata/test_rule_selected_24sata.csv',
     },
