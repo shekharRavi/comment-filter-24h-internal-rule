@@ -390,35 +390,34 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
 
     for input_ids, input_mask, segment_ids, label_ids in test_dataloader:
 
-        pred = nb_predicts[counter]
-        certainities = nb_predicts_prob[counter]
+        # pred = nb_predicts[counter]
+        # certainities = nb_predicts_prob[counter]
 
         #Only if NB is not predicting Rule 1.
         #TODO: Need to remove NB in future, no real benifit
-        if pred != 1 and certainities[1] < 0.55:
-            input_ids = input_ids.to(device)
-            input_mask = input_mask.to(device)
+        
+        input_ids = input_ids.to(device)
+        input_mask = input_mask.to(device)
 
-            with torch.no_grad():
+        with torch.no_grad():
+            outputs = model(input_ids, token_type_ids=None, attention_mask=input_mask)
+            logits = outputs[0]
 
-                outputs = model(input_ids, token_type_ids=None, attention_mask=input_mask)
-                logits = outputs[0]
-
-            logits = softmax(logits)
-            logits = logits.detach().cpu().numpy()
-            preds = np.argmax(logits, axis=1).tolist()
-            certainities = np.amax(logits, axis=1).tolist()
+        logits = softmax(logits)
+        logits = logits.detach().cpu().numpy()
+        preds = np.argmax(logits, axis=1).tolist()
+        certainities = np.amax(logits, axis=1).tolist()
             
-            details = {}
-            #TODO: check something looks wrong here
-            for idx in range(0,9):
-                logit = logits[:,idx][0]
+        details = {}
+        #TODO: check something looks wrong here
+        for idx in range(0,9):
+            logit = logits[:,idx][0]
 
-                if idx == 0:
-                    details["PASS"]=logit
-                else:
-                    rule = "RULE-"+str(idx)
-                    details[rule]=logit
+            if idx == 0:
+                details["PASS"]=logit
+            else:
+                rule = "RULE-"+str(idx)
+                details[rule]=logit
         # else:
         #     rule = "RULE-1"
         #     details[rule]=logit
