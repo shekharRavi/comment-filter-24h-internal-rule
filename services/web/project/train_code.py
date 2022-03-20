@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 from datasets import load_metric
 from datasets import load_from_disk
 
-# import wandb
-# wandb.init(project="train-classification", entity="hahackathon")
+import wandb
+wandb.init(project="train-classification", entity="hahackathon")
 
 from sklearn.utils import class_weight
 
