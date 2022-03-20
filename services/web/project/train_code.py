@@ -192,9 +192,8 @@ if __name__ == '__main__':
 
         )
 
-        model = AutoModelForSequenceClassification.from_pretrained(model_dir, num_labels=len(np.unique(train_labels)), classifier_dropout=0.1)
+        model = AutoModelForSequenceClassification.from_pretrained(model_dir, num_labels=9, classifier_dropout=0.1)
 
-        #TODO: Trainer not working on Server due to some issue
         trainer = CustomTrainer(
             model=model,  # the instantiated Transformers model to be trained
             args=training_args,  # training arguments, defined above
