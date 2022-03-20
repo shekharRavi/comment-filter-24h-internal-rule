@@ -16,7 +16,10 @@ for rule in rules:
     data[rule]=len(sel_data)
 
 print(data)
-data.to_csv('rule_stat.csv', index=False)
+
+data_df= pd.DataFrame(data.items(), columns=['rule', 'count']) 
+
+data_df.to_csv('rule_stat.csv', index=False)
 
 rules = [2,3,4,5,6,7,1,8,0]
 
@@ -39,5 +42,6 @@ for idx, rule in enumerate(rules):
 
     # print(rule, len(sel_data), len(save_df))
 print(data)
-data.to_csv('rule_stat_selected.csv', index=False)
+data_df= pd.DataFrame(data.items(), columns=['rule', 'count']) 
+data_df.to_csv('rule_stat_selected.csv', index=False)
 save_df.to_csv('rule_selected_24sata.csv', index=False)
