@@ -61,8 +61,8 @@ def read_data(file_name):
     df = pd.read_csv(file_name, lineterminator='\n')
     #df = df.head(100)
     print('Processing', file_name, df.shape)
-    texts= df.content.tolist()
-    labels = df.label.tolist()
+    texts= df.content[:100].tolist()
+    labels = df.label[:100].tolist()
 
     return texts, labels
 
@@ -76,6 +76,8 @@ class HRDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         item = {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
         item['labels'] = torch.tensor(self.labels[idx])
+
+        print(item)
         return item
 
     def __len__(self):
