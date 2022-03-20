@@ -34,7 +34,7 @@ for idx, rule in enumerate(rules):
     else:
         if rule in [8,0,1]:
             if len(train_df) + len(val_df) < len(sel_data):
-                n = int(len(save_df) * 1.5)
+                n = int((len(train_df) + len(val_df)) * 1.5)
                 if n < len(sel_data):
                     # print('n.',n, 'sel',len(sel_data))
                     sel_data = sel_data.sample(n = n)
