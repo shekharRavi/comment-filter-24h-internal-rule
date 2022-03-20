@@ -59,7 +59,7 @@ def read_data(file_name):
     #Reading CSV File
 
     df = pd.read_csv(file_name, lineterminator='\n')
-    df.infringed_on_rule = df.infringed_on_rule.astype(int)
+    df.label = df.label.astype(int)
     #df = df.head(100)
     print('Processing', file_name, df.shape)
     texts= df.content[:100].tolist()
