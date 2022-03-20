@@ -40,7 +40,7 @@ for idx, rule in enumerate(rules):
                     sel_data = sel_data.sample(n = n)
         
         train = sel_data.sample(frac=0.9)
-        val = sel_data.drop(train_df.index)
+        val = sel_data.drop(train.index)
         
         train_df = pd.concat([train_df, train])
         val_df = pd.concat([val_df, val])
