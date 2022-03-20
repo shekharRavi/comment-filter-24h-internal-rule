@@ -465,7 +465,8 @@ if __name__ == "__main__":
     #     if i > 2:
     #         break
     label, confidence,detail = predict(text[:100])
+    print(len(text), len(label))
     df = pd.DataFrame({'content':text, 'embeddia_rule':label, 'result':confidence, 'details':detail})
 
     df.to_csv('output.csv',index=False)
-    print(len(text), len(label))
+    
