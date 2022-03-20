@@ -55,12 +55,13 @@ def fix_metrics(metrics):
                 metrics[key] = metrics[key][key1]
     return metrics
 
-def read_data(file_name):
+def read_data(file_name, samll=False):
     #Reading CSV File
 
     df = pd.read_csv(file_name, lineterminator='\n')
     df.label = df.label.astype(int)
-    df = df.head(5000)
+    if samll:
+        df = df.head(1000)
     print('Processing', file_name, df.shape)
     texts= df.content.tolist()
     labels = df.label.tolist()
