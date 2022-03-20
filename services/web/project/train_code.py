@@ -82,7 +82,7 @@ class HRDataset(torch.utils.data.Dataset):
         return len(self.labels)
 
 class CustomTrainer(Trainer):
-    def __init__(self, class_weights=weight=torch.tensor([1.0, 1.0, 1.0,1.0, 1.0, 1.0,1.0, 1.0, 1.0]), *args, **kwargs):
+    def __init__(self, class_weights=torch.tensor([1.0, 1.0, 1.0,1.0, 1.0, 1.0,1.0, 1.0, 1.0]), *args, **kwargs):
         super().__init__(*args, **kwargs)
         # You pass the class weights when instantiating the Trainer
         self.class_weights = class_weights
