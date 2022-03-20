@@ -26,7 +26,7 @@ model_cards = {
 
 datasets = {
 'rule':{
-        'train_file':'/import/cogsci/ravi/datasets/24sata/val_rule_selected_24sata.csv',
+        'train_file':'/import/cogsci/ravi/datasets/24sata/train_rule_selected_24sata.csv',
         'val_file':'/import/cogsci/ravi/datasets/24sata/val_rule_selected_24sata.csv',
         'test_file':'/import/cogsci/ravi/datasets/24sata/test_rule_selected_24sata.csv',
     },
@@ -62,8 +62,8 @@ def read_data(file_name):
     df.label = df.label.astype(int)
     #df = df.head(100)
     print('Processing', file_name, df.shape)
-    texts= df.content[:100].tolist()
-    labels = df.label[:100].tolist()
+    texts= df.content.tolist()
+    labels = df.label.tolist()
 
     return texts, labels
 
