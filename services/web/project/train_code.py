@@ -143,6 +143,7 @@ if __name__ == '__main__':
     model_card= args.model_card
     all_steps = args.all_steps
 
+    model_dirs  = []
     model_dir = model_cards[model_card]
     model_dirs.append(model_dir)
     
