@@ -457,14 +457,15 @@ if __name__ == "__main__":
     import pandas as pd
     data = pd.read_csv('/import/cogsci/ravi/2019_data.csv')
 
-    text = data.content.values.tolist()
+    content = data.content.values.tolist()
+    text = content[:100]
     # c = 1064468
 
     # for i, t in enumerate(data[data['infringed_on_rule'] == 1].content.values):
     #     text.append(t)
     #     if i > 2:
     #         break
-    label, confidence,detail = predict(text[:100])
+    label, confidence,detail = predict()
     print(len(text), len(label))
     df = pd.DataFrame({'content':text, 'embeddia_rule':label, 'result':confidence, 'details':detail})
 
