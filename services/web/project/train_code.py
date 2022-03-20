@@ -155,7 +155,7 @@ if __name__ == '__main__':
     print(model_dirs)
 
     tokenizer = AutoTokenizer.from_pretrained(model_dir)
-    data_collator = DataCollatorWithPadding(tokenizer=tokenizer, do_lower_case=False)
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
     #TODO: Maybe want to save the dataset, so that processing is less
     train_texts, train_labels = read_data(train_file)
