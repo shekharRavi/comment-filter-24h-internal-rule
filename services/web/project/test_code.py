@@ -408,8 +408,7 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
             logits = logits.detach().cpu().numpy()
             preds = np.argmax(logits, axis=1).tolist()
             certainities = np.amax(logits, axis=1).tolist()
-            if len(certainities)>1:
-                print(certainities)
+            
             details = {}
             #TODO: check something looks wrong here
             for idx in range(0,9):
@@ -424,7 +423,8 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
         #     rule = "RULE-1"
         #     details[rule]=logit
 
-
+        if len(certainities)>1:
+                print(certainities)
         all_preds.extend(preds)
         all_certainities.extend(certainities)
         all_details.append(details)
