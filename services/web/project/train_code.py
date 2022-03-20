@@ -82,7 +82,7 @@ class HRDataset(torch.utils.data.Dataset):
         return len(self.labels)
 
 class CustomTrainer(Trainer):
-    def __init__(self, class_weights, *args, **kwargs):
+    def __init__(self, class_weights=weight=torch.tensor([1.0, 1.0, 1.0,1.0, 1.0, 1.0,1.0, 1.0, 1.0]), *args, **kwargs):
         super().__init__(*args, **kwargs)
         # You pass the class weights when instantiating the Trainer
         self.class_weights = class_weights
@@ -195,7 +195,7 @@ if __name__ == '__main__':
         model = AutoModelForSequenceClassification.from_pretrained(model_dir, num_labels=len(np.unique(train_labels)), classifier_dropout=0.1)
 
         #TODO: Trainer not working on Server due to some issue
-        trainer = Trainer(
+        trainer = CustomTrainer(
             model=model,  # the instantiated Transformers model to be trained
             args=training_args,  # training arguments, defined above
             train_dataset=train_dataset,  # training dataset
