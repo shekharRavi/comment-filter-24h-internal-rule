@@ -57,12 +57,12 @@ def fix_metrics(metrics):
                 metrics[key] = metrics[key][key1]
     return metrics
 
-def read_data(file_name, samll=True):
+def read_data(file_name, small_dataset=False):
     #Reading CSV File
 
     df = pd.read_csv(file_name, lineterminator='\n')
     df.label = df.label.astype(int)
-    if samll:
+    if small_dataset:
         df = df.head(1000)
     print('Processing', file_name, df.shape)
     texts= df.content.tolist()
@@ -89,7 +89,7 @@ class HRDataset(torch.utils.data.Dataset):
         return len(self.labels)
 
 class CustomTrainer(Trainer):
-    def __init__(self, class_weights=torch.tensor([1.0, 1.0, 1.0,1.0, 1.0, 1.0,1.0, 1.0, 1.0]), *args, **kwargs):
+    def __init__(self, class_weights=torch.FloatTensor([1.0, 1.0, 1.0,1.0, 1.0, 1.0,1.0, 1.0, 1.0]), *args, **kwargs):
         super().__init__(*args, **kwargs)
         # You pass the class weights when instantiating the Trainer
         self.class_weights = class_weights
@@ -121,11 +121,12 @@ if __name__ == '__main__':
     parser.add_argument("--learning_rate", default=2e-5, type=float)
 
     #Dataset
-    parser.add_argument("-dataset", type=str, default='rule', help='Training validation set large/small')
+    parser.add_argument("--dataset", type=str, default='rule', help='Training validation set large/small')
 
     #Model
-    parser.add_argument("-model_card", type=str, default='csebert', help='The model directory checkpoint for weights initialization.')
+    parser.add_argument("--model_card", type=str, default='csebert', help='The model directory checkpoint for weights initialization.')
     parser.add_argument("-all_steps", action='store_true', help='To Train on all steps check point')
+    parser.add_argument("-small_dataset", action='store_true', help='To Train on small dataset')
 
    
     args = parser.parse_args()
@@ -143,6 +144,7 @@ if __name__ == '__main__':
     save_total_limit = args.save_total_limit
     save_strategy = args.save_strategy
     max_seq_length = 256
+    small_dataset=args.small
 
     dataset = args.dataset
     train_file = datasets[dataset]['train_file']
@@ -161,17 +163,17 @@ if __name__ == '__main__':
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
     #TODO: Maybe want to save the dataset, so that processing is less
-    train_texts, train_labels = read_data(train_file)
+    train_texts, train_labels = read_data(train_file,small_dataset=small_dataset)
     train_encodings = tokenizer(train_texts, truncation=True, padding=True, max_length=max_seq_length)
     train_dataset = HRDataset(train_encodings, train_labels)
-    val_texts, val_labels = read_data(val_file)
+    val_texts, val_labels = read_data(val_file,small_dataset=small_dataset)
     val_encodings = tokenizer(val_texts, truncation=True, padding=True,max_length=max_seq_length)
     val_dataset = HRDataset(val_encodings, val_labels)
 
     # encoded_dataset.save_to_disk("path/of/my/dataset/directory")
     # reloaded_encoded_dataset = load_from_disk("path/of/my/dataset/directory")
 
-    class_weights = torch.tensor(class_weight.compute_class_weight('balanced',
+    class_weights = torch.FloatTensor(class_weight.compute_class_weight('balanced',
                                                          classes=np.unique(train_labels),
                                                          y=train_labels)).to(device)
 
