@@ -64,7 +64,7 @@ def read_data(file_name, small_dataset=False):
     df.label = df.label.astype(int)
     if small_dataset:
         df = df.sample(frac=1)
-        df = df.head(5000)
+        df = df.head(10000)
     print('Processing', file_name, df.shape)
     texts= df.content.tolist()
     labels = df.label.tolist()
