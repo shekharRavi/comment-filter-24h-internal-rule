@@ -19,6 +19,8 @@ wandb.init(project="train-classification", entity="hahackathon")
 
 from sklearn.utils import class_weight
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 model_cards = {
 "mbert":'bert-base-multilingual-cased',
 "csebert":'EMBEDDIA/crosloengual-bert',
@@ -55,7 +57,7 @@ def fix_metrics(metrics):
                 metrics[key] = metrics[key][key1]
     return metrics
 
-def read_data(file_name, samll=False):
+def read_data(file_name, samll=True):
     #Reading CSV File
 
     df = pd.read_csv(file_name, lineterminator='\n')
@@ -171,7 +173,7 @@ if __name__ == '__main__':
 
     class_weights = torch.tensor(class_weight.compute_class_weight('balanced',
                                                          classes=np.unique(train_labels),
-                                                         y=train_labels))
+                                                         y=train_labels)).to(device)
 
 
     for model_dir in model_dirs:
