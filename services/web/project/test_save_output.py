@@ -45,19 +45,19 @@ def read_data(file_name, small_dataset=False):
         df = df.sample(frac=1)
         df = df.head(1000)
     print('Processing', file_name, df.shape)
-    idx= df.index.tolist()
+    
     texts= df.content.tolist()
     labels = df.label.tolist()
 
-    return idx, texts, labels
+    return texts, labels
 
 
 class HRDataset(torch.utils.data.Dataset):
     #24Sata Dataset Processing
-    def __init__(self, encodings, labels,idxs):
+    def __init__(self, encodings, labels):
         self.encodings = encodings
         self.labels = labels
-        self.idxs = idxs
+        
 
     def __getitem__(self, idx):
         item = {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
     # TODO: Maybe want to save the dataset, so that processing is less
-    test_idxs, test_texts, test_labels = read_data(test_file,small_dataset=small_dataset)
+    test_texts, test_labels = read_data(test_file,small_dataset=small_dataset)
     test_encodings = tokenizer(test_texts, truncation=True, padding=True)
     test_dataset = HRDataset(test_encodings, test_labels)
 
