@@ -14,9 +14,9 @@ logger = logging.getLogger(__name__)
 from datasets import load_metric
 from datasets import load_from_disk
 
-import wandb
-wandb.init(project="train-classification", entity="hahackathon")
-os.environ["WANDB_DISABLED"] = True
+# import wandb
+# wandb.init(project="train-classification", entity="hahackathon")
+os.environ["WANDB_DISABLED"] = "true"
 
 from sklearn.utils import class_weight
 
