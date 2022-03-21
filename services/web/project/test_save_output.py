@@ -136,8 +136,8 @@ if __name__ == '__main__':
         probs = np.amax(logits, axis=1).tolist()
 
         # all_idx.append(batch_idx)
-        all_preds.append(preds)
-        all_probs.append(probs)
+        all_preds.extend(preds)
+        all_probs.extend(probs)
 
     result = pd.DataFrame([all_preds, all_probs])
     result = result.transpose()
