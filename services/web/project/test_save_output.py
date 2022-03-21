@@ -143,7 +143,8 @@ if __name__ == '__main__':
     result = result.transpose()
     result.columns = ['embeddia_rule', 'result']
     result.head()
-    
+    result.embeddia_rule = result.embeddia_rule.astype(int)
+
     result.to_csv(out_file, index=False)
     print('Output saved to ', out_file)
 
