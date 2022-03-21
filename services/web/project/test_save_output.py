@@ -91,6 +91,7 @@ if __name__ == '__main__':
     model_dir= args.model_dir
     batch_size = args.batch_size
     out_file = model_dir + args.out_file
+    max_seq_length = 256
 
     #Only done once because it assumes main directory will have same pre-processing part
     tokenizer = AutoTokenizer.from_pretrained(model_dir)
@@ -98,7 +99,7 @@ if __name__ == '__main__':
 
     # TODO: Maybe want to save the dataset, so that processing is less
     test_texts, test_labels = read_data(test_file,small_dataset=small_dataset)
-    test_encodings = tokenizer(test_texts, truncation=True, padding=True)
+    test_encodings = tokenizer(test_texts,truncation=True, padding=True,max_length=max_seq_length)
     test_dataset = HRDataset(test_encodings, test_labels)
 
     sampler = SequentialSampler(test_dataset)
