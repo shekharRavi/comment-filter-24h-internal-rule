@@ -137,7 +137,7 @@ if __name__ == '__main__':
         probs = np.amax(logits, axis=1).tolist()
 
         for logit in logits:
-            all_probs_rules.append(logit)
+            all_probs_rules.append(logit.tolist())
         # all_idx.append(batch_idx)
         all_preds.extend(preds)
         all_probs.extend(probs)
