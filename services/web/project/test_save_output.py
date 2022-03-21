@@ -41,6 +41,7 @@ def read_data(file_name, small_dataset=False):
     #Reading CSV File
 
     df = pd.read_csv(file_name, lineterminator='\n')
+    df.label = df.label.astype(int)
     if small_dataset:
         df = df.sample(frac=1)
         df = df.head(1000)
