@@ -108,17 +108,17 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     # Training Parameters
-    parser.add_argument("-output_dir", type=str, default="./results/claasify/", help='Output Directory')
-    parser.add_argument("-logging_dir", type=str, default="./logs/claasify/", help='Logging Directory')
-    parser.add_argument("-num_train_epochs", type=int, default=5, help='Number of training Epochs')
-    parser.add_argument("-per_device_train_batch_size", type=int, default=24, help='Traiing Batch Size')
-    parser.add_argument("-per_device_eval_batch_size", type=int, default=24, help='Evaluation Batch Size')
-    parser.add_argument("-warmup_steps", type=int, default=500, help='Warmup Steps')
-    parser.add_argument("-weight_decay", type=int, default=0.01, help='Weight Decay Rate')
-    parser.add_argument("-logging_steps", type=int, default=500, help='Logging Steps')
-    parser.add_argument("-save_steps", type=int, default=5000, help='Number of updates steps before two checkpoint saves')
-    parser.add_argument("-save_total_limit", type=int, default=50, help='If a value is passed, will limit the total amount of checkpoints. Deletes the older checkpoints')
-    parser.add_argument("-save_strategy", type=str, default="epoch", help='[no/steps/epoch]The checkpoint save strategy to adopt during training')
+    parser.add_argument("--output_dir", type=str, default="./results/claasify/", help='Output Directory')
+    parser.add_argument("--logging_dir", type=str, default="./logs/claasify/", help='Logging Directory')
+    parser.add_argument("--num_train_epochs", type=int, default=5, help='Number of training Epochs')
+    parser.add_argument("--per_device_train_batch_size", type=int, default=24, help='Traiing Batch Size')
+    parser.add_argument("--per_device_eval_batch_size", type=int, default=24, help='Evaluation Batch Size')
+    parser.add_argument("--warmup_steps", type=int, default=500, help='Warmup Steps')
+    parser.add_argument("--weight_decay", type=int, default=0.01, help='Weight Decay Rate')
+    parser.add_argument("--logging_steps", type=int, default=500, help='Logging Steps')
+    parser.add_argument("--save_steps", type=int, default=5000, help='Number of updates steps before two checkpoint saves')
+    parser.add_argument("--save_total_limit", type=int, default=50, help='If a value is passed, will limit the total amount of checkpoints. Deletes the older checkpoints')
+    parser.add_argument("--save_strategy", type=str, default="epoch", help='[no/steps/epoch]The checkpoint save strategy to adopt during training')
     parser.add_argument("--learning_rate", default=2e-5, type=float)
 
     #Dataset
