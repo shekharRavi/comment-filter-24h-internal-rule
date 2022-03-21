@@ -129,7 +129,7 @@ if __name__ == '__main__':
         outputs = model(**batch)
 
         # batch_idx = batch['idx'].tolist()
-
+        logits = outputs[1]
         logits = softmax(logits)
         logits = logits.detach().cpu().numpy()
         preds = np.argmax(logits, axis=1).tolist()
