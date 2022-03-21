@@ -115,7 +115,7 @@ if __name__ == '__main__':
     parser.add_argument("-logging_steps", type=int, default=500, help='Logging Steps')
     parser.add_argument("-save_steps", type=int, default=5000, help='Number of updates steps before two checkpoint saves')
     parser.add_argument("-save_total_limit", type=int, default=50, help='If a value is passed, will limit the total amount of checkpoints. Deletes the older checkpoints')
-    parser.add_argument("-save_strategy", type=str, default="steps", help='The checkpoint save strategy to adopt during training')
+    parser.add_argument("-save_strategy", type=str, default="epochs", help='The checkpoint save strategy to adopt during training')
     parser.add_argument("--learning_rate", default=2e-5, type=float)
 
     #Dataset
@@ -169,9 +169,9 @@ if __name__ == '__main__':
     # encoded_dataset.save_to_disk("path/of/my/dataset/directory")
     # reloaded_encoded_dataset = load_from_disk("path/of/my/dataset/directory")
 
-    class_weights = dict(enumerate(class_weight.compute_class_weight('balanced',
+    class_weights = torch.tensor(class_weight.compute_class_weight('balanced',
                                                          classes=np.unique(train_labels),
-                                                         y=train_labels)))
+                                                         y=train_labels))
 
 
     for model_dir in model_dirs:
@@ -200,7 +200,7 @@ if __name__ == '__main__':
 
         model = AutoModelForSequenceClassification.from_pretrained(model_dir, num_labels=9, classifier_dropout=0.1)
 
-        trainer = Trainer(
+        trainer = CustomTrainer(
             model=model,  # the instantiated Transformers model to be trained
             args=training_args,  # training arguments, defined above
             train_dataset=train_dataset,  # training dataset
@@ -208,6 +208,7 @@ if __name__ == '__main__':
             tokenizer = tokenizer,
             compute_metrics=compute_metrics,
             data_collator=data_collator,
+            class_weights=class_weights
         )
 
         train_result = trainer.train(resume_from_checkpoint=None)
