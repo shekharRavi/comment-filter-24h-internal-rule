@@ -16,6 +16,7 @@ from datasets import load_from_disk
 
 import wandb
 wandb.init(project="train-classification", entity="hahackathon")
+os.environ["WANDB_DISABLED"] = True
 
 from sklearn.utils import class_weight
 
