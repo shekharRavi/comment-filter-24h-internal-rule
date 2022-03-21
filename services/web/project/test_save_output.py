@@ -123,6 +123,7 @@ if __name__ == '__main__':
     all_idx = []
     all_preds = []
     all_probs = []
+    all_probs_rules = []
     for step, batch in enumerate(data_iterator):
 
         batch = batch.to(device)
@@ -135,13 +136,15 @@ if __name__ == '__main__':
         preds = np.argmax(logits, axis=1).tolist()
         probs = np.amax(logits, axis=1).tolist()
 
+        for logit in logits:
+            all_probs_rules.append(logit)
         # all_idx.append(batch_idx)
         all_preds.extend(preds)
         all_probs.extend(probs)
 
-    result = pd.DataFrame([all_preds, all_probs])
+    result = pd.DataFrame([all_preds, all_probs,all_probs_rules])
     result = result.transpose()
-    result.columns = ['embeddia_rule', 'result']
+    result.columns = ['embeddia_rule', 'result', 'all_result']
     result.head()
     result.embeddia_rule = result.embeddia_rule.astype(int)
 
