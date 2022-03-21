@@ -62,7 +62,7 @@ class HRDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         item = {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
         item['labels'] = torch.tensor(self.labels[idx])
-        item['idx'] = torch.tensor(self.idxs[idx])
+        # item['idx'] = torch.tensor(self.idxs[idx])
         return item
 
     def __len__(self):
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     # TODO: Maybe want to save the dataset, so that processing is less
     test_idxs, test_texts, test_labels = read_data(test_file,small_dataset=small_dataset)
     test_encodings = tokenizer(test_texts, truncation=True, padding=True)
-    test_dataset = HRDataset(test_encodings, test_labels,test_idxs)
+    test_dataset = HRDataset(test_encodings, test_labels)
 
     sampler = SequentialSampler(test_dataset)
     
@@ -127,20 +127,20 @@ if __name__ == '__main__':
         batch = batch.to(device)
         outputs = model(**batch)
 
-        batch_idx = batch['idx'].tolist()
+        # batch_idx = batch['idx'].tolist()
 
         logits = softmax(logits)
         logits = logits.detach().cpu().numpy()
         preds = np.argmax(logits, axis=1).tolist()
         probs = np.amax(logits, axis=1).tolist()
 
-        all_idx.append(batch_idx)
+        # all_idx.append(batch_idx)
         all_preds.append(preds)
         all_probs.append(probs)
 
-    result = pd.DataFrame([all_idx, all_preds, all_probs])
+    result = pd.DataFrame([all_preds, all_probs])
     result = result.transpose()
-    result.columns = ['idx', 'embeddia_rule', 'result']
+    result.columns = ['embeddia_rule', 'result']
     result.head()
     
     result.to_csv(out_file, index=False)
