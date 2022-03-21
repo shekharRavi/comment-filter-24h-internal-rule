@@ -115,7 +115,7 @@ if __name__ == '__main__':
     parser.add_argument("-logging_steps", type=int, default=500, help='Logging Steps')
     parser.add_argument("-save_steps", type=int, default=5000, help='Number of updates steps before two checkpoint saves')
     parser.add_argument("-save_total_limit", type=int, default=50, help='If a value is passed, will limit the total amount of checkpoints. Deletes the older checkpoints')
-    parser.add_argument("-save_strategy", type=str, default="epochs", help='The checkpoint save strategy to adopt during training')
+    parser.add_argument("-save_strategy", type=str, default="epoch", help='[no/steps/epoch]The checkpoint save strategy to adopt during training')
     parser.add_argument("--learning_rate", default=2e-5, type=float)
 
     #Dataset
