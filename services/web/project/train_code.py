@@ -199,7 +199,7 @@ if __name__ == '__main__':
             save_total_limit = save_total_limit,
             save_strategy=save_strategy,
             save_steps=save_steps,
-            report_to="wandb", #Log into Weight and Bias
+            # report_to="wandb", #Log into Weight and Bias
             evaluation_strategy="steps" #Evaluate at very logging steps
 
         )
