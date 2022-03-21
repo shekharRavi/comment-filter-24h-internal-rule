@@ -144,7 +144,7 @@ if __name__ == '__main__':
     save_total_limit = args.save_total_limit
     save_strategy = args.save_strategy
     max_seq_length = 256
-    small_dataset=args.small
+    small_dataset=args.small_dataset
 
     dataset = args.dataset
     train_file = datasets[dataset]['train_file']
