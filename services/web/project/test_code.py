@@ -401,7 +401,7 @@ def predict_ml_hs(data, tokenizer, model, model_nb, device):
 
         with torch.no_grad():
             outputs = model(input_ids, token_type_ids=None, attention_mask=input_mask)
-            logits = outputs[0]
+            logits = outputs.logits
 
         logits = softmax(logits)
         logits = logits.detach().cpu().numpy()
