@@ -109,12 +109,6 @@ if __name__ == '__main__':
     data_iterator = tqdm(test_dataloader, desc="Iteration")
     softmax = torch.nn.Softmax(dim=-1)
     
-    true_labels = []
-    all_mean0 = []
-    all_std0  = []
-    all_mean1 = []
-    all_std1 = []
-
     device = torch.cuda.current_device()
 
     model = AutoModelForSequenceClassification.from_pretrained(model_dir)
