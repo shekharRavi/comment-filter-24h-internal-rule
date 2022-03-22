@@ -76,7 +76,7 @@ if __name__ == '__main__':
     #Dataset
     parser.add_argument("--test_file", type=str, default='/import/cogsci/ravi/datasets/24sata/test_rule_selected_24sata.csv', help='Test File')
     parser.add_argument("--encode_data", type=bool, default=False, help='Encode data')
-    parser.add_argument("--batch_size", type=int, default=64, help='batch size')
+    parser.add_argument("--batch_size", type=int, default=24, help='batch size')
 
     #Model
     parser.add_argument("--model_dir", type=str, default='./results/claasify/csebert_rule/', help='The model directory checkpoint for weights initialization.')
