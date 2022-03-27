@@ -174,6 +174,9 @@ def proces_file():
 
     df['key_rule']=0
 
+    df = df[df.infringed_on_rule == 7]
+    df = df.reset_index()
+
     for i in tqdm(range(len(df))):
         content = df.loc[i,'content']
 
@@ -182,8 +185,8 @@ def proces_file():
         if rule != -1:
             df.loc[i, 'key_rule'] = rule
 
-        # if i > 100:
-        #     break
+        if i > 100:
+            break
 
     save_file = out_dir+'keywords_rule_'+file_name
     df.to_csv(save_file, index=False)
