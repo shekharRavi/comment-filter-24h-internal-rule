@@ -23,6 +23,11 @@ R4=pd.read_csv(out_dir+r4_file).rule_word.tolist()
 R5=pd.read_csv(out_dir+r5_file).rule_word.tolist()
 R6=pd.read_csv(out_dir+r6_file).rule_word.tolist()
 
+all_words = []
+for R_words in zip(R2, R3,R4,R5,R6):
+    all_words.extend(R_words)
+all_words = list(set(all_words))
+
 not_allowed_words = ['24sata', 'admin', 'Adolf', 'Hitler', 'jebem', 'jebemti', 'pička', 'lezba', 'majmun',
                      'mater', 'majku', 'kurac', 'seri', 'seres', 'nabijem', 'glup', 'idijot', 'idiot', 'budala',
                      'kreten', 'pizda', 'klad', 'kladi', 'ZDS', 'klaunski', 'mater', 'smece', 'tenkre', 'bilde',
@@ -151,10 +156,7 @@ def keyword_based_classification(text):
             conf = 0.9
         else:
             #Check based on keywords for Rule 2,3,4,5,6
-            all_words = []
-            for R_words in zip(R2, R3,R4,R5,R6):
-                all_words.extend(R_words)
-            all_words = list(set(all_words))
+            
             rule_words = [R2, R3,R4,R5,R6, all_words]
             thresholds = [2,2,2,2,2,1] #For Major rule higher threshold
             rules = [2,3,4,5,6,8]
