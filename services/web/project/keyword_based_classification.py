@@ -183,11 +183,11 @@ def proces_file():
         if rule != -1:
             df.loc[i, 'key_rule'] = rule
 
-        if i > 100:
-            break
+        # if i > 100:
+        #     break
 
-    # save_file = out_dir+'keywords_rule_'+file_name
-    # df.to_csv(save_file, index=False)
-    # print('Saved to', save_file)
+    save_file = out_dir+'keywords_rule_'+file_name
+    df.to_csv(save_file, index=False)
+    print('Saved to', save_file)
 
 proces_file()
