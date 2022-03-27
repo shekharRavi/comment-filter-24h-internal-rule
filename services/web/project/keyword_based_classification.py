@@ -58,22 +58,47 @@ def check_blocked_words(text,not_allowed_words=[]):
             break
     return rule_flag
 
-def check_rule_seven(text):
-    # To check based on the language and upper case
+def upper_check(text):
     rule_flag = False
+
+    # print(text)
     if text.isupper():
         rule_flag = True
         # print('All upper')
     else:
-        text = " ".join(re.findall("[a-zA-Z]+", text))
         words = text.split(' ')
         c_w = len(words)
-        if c_w > 3:
+        up_count = 0
+        for word in words:
+            if word.isupper():
+                up_count += 1
+                ratio = up_count / c_w
+                diff = c_w - up_count
+                if diff < 3:
+                    rule_flag = True
+                    break
+                elif ratio > 0.9:
+                    rule_flag = True
+                    break
+    return rule_flag
+
+def check_rule_seven(text):
+    # To check based on the language and upper case
+    text = " ".join(re.findall("[a-zA-Z]+", text))
+    rule_flag = upper_check(text)
+    if not rule_flag:
+        words = text.split(' ')
+        c_w = len(words)
+        if c_w > 0:
             rule_flag = True
-            # Check in two instances
-            val1 = " ".join(words[:int(c_w/2)])
-            val2 = " ".join(words[int(c_w/2):])
-            for val in [val1, val2,text]:
+            if len(words)>4:
+                # Check in two instances
+                val1 = " ".join(words[:int(c_w/2)])
+                val2 = " ".join(words[int(c_w/2):])
+                values = [val1,val2, text]
+            else:
+                values = [text]
+            for val in values:
                 try:
                     lang2 = detect(val) #Easy to run
                 except:
@@ -84,7 +109,7 @@ def check_rule_seven(text):
                         lang1 = str(lang_detector.detect_language_of(val))[9:]
                     except:
                         lang1 = 'CROATIAN'
-
+                    # print(lang1)
                     if lang1 in valid_langs: #Found valid language, so not breaking Rule 7
                         rule_flag = False  # Found valid language, so not breaking Rule 7
                         break
@@ -93,6 +118,7 @@ def check_rule_seven(text):
                     break
 
     return rule_flag
+
 
 
 def keyword_to_rule(text,rule_words,threshold=2):
