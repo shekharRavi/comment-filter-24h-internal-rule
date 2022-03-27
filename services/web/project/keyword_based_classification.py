@@ -151,9 +151,13 @@ def keyword_based_classification(text):
             conf = 0.9
         else:
             #Check based on keywords for Rule 2,3,4,5,6
-            rule_words = [R2, R3,R4,R5,R6]
-            thresholds = [2,2,2,1,1] #For Major rule higher threshold
-            rules = [2,3,4,5,6]
+            all_words = []
+            for R_words in zip(R2, R3,R4,R5,R6):
+                all_words.extend(R_words)
+            all_words = list(set(all_words))
+            rule_words = [R2, R3,R4,R5,R6, all_words]
+            thresholds = [2,2,2,2,2,1] #For Major rule higher threshold
+            rules = [2,3,4,5,6,8]
             for rule_word, threshold, rule in zip(rule_words,thresholds, rules):
                 rule_flag = keyword_to_rule(text,rule_words,threshold=threshold)
                 if rule_flag:
