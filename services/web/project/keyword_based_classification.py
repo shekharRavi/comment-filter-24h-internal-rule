@@ -8,7 +8,7 @@ from tqdm import tqdm
 lang_detector = LanguageDetectorBuilder.from_all_languages().with_preloaded_language_models().build()
 valid_langs= ['BOSNIAN', 'SERBIAN','CROATIAN','MONTENEGRIN','ENGLISH', 'SLOVENE','SLOVAK', 'hr','sr','bs','cnr','en','sl','slv']
 
-dir_name = '/import/cogsci/ravi/datasets/'
+dir_name = '/import/cogsci/ravi/datasets/24sata/'
 out_dir = dir_name +'word_counts/'
 
 r2_file = '2_possible_words.csv'
