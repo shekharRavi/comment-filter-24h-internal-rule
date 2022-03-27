@@ -63,7 +63,7 @@ def check_rule_seven(text):
     rule_flag = False
     if text.isupper():
         rule_flag = True
-        print('All upper')
+        # print('All upper')
     else:
         text = " ".join(re.findall("[a-zA-Z]+", text))
         words = text.split(' ')
