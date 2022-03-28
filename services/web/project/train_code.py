@@ -33,6 +33,11 @@ datasets = {
         'val_file':'/import/cogsci/ravi/datasets/24sata/val_rule_selected_24sata.csv',
         'test_file':'/import/cogsci/ravi/datasets/24sata/test_rule_selected_24sata.csv',
     },
+'rule_mod':{ #This is new data by adding 2022 tested on the EMBEDDIA system 
+        'train_file':'/import/cogsci/ravi/datasets/24sata/train_mod_rule_selected_24sata.csv',
+        'val_file':'/import/cogsci/ravi/datasets/24sata/val_mod_rule_selected_24sata.csv',
+        'test_file':'/import/cogsci/ravi/datasets/24sata/test_mod_rule_selected_24sata.csv',
+    },
 
 }
 
