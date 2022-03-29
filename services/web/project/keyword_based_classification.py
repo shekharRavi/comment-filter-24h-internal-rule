@@ -28,7 +28,7 @@ for R_words in zip(R2, R3,R4,R5,R6):
     all_words.extend(R_words)
 all_words = list(set(all_words))
 
-not_allowed_words = ['24sata', 'admin', 'Adolf', 'Hitler', 'jebem', 'jebemti', 'pička', 'lezba', 'majmun',
+not_allowed_words = ['Adolf', 'Hitler', 'jebem', 'jebemti', 'pička', 'lezba', 'majmun',
                      'mater', 'majku', 'kurac', 'seri', 'seres', 'nabijem', 'glup', 'idijot', 'idiot', 'budala',
                      'kreten', 'pizda', 'klad', 'kladi', 'ZDS', 'klaunski', 'mater', 'smece', 'tenkre', 'bilde',
                      'debil', 'jebi', 'cigan', 'govn', 'seljac', 'drolj', 'kozojeb', 'musliman', 'klaunski',
