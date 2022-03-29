@@ -17,6 +17,7 @@ RUN  apt-get update && \
     apt-get install -y netcat && \
     apt-get install -y wget && \
     apt-get install -y unzip && \
+    apt-get install -y git && \
     apt-get install -y gcc
 #git
 

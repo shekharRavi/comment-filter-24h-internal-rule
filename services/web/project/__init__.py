@@ -67,6 +67,7 @@ hate_speech_single_input = api.model('HateSpeechSingleInput', {
 hate_speech_single_output = api.model('HateSpeechSingleOutput', {
     'decision': fields.String(required=True, description='predicted class'),
     'result': fields.Float(required=True, description='prediction confidence'),
+    'rule': fields.String(required=True, description='rule: broke by the comment'),
     "details":fields.Raw(description='All rules probabilities'),
 
    })
@@ -77,6 +78,7 @@ hate_speech_list_input = api.model('HateSpeechListInput', {
 hate_speech_list_output = api.model('HateSpeechListOutput', {
     'decision': fields.List(fields.String, required=True, description='list of predicted classes'),
     'result': fields.List(fields.Float, required=True, description='list of prediction confidences'),
+    'rule': fields.List(fields.String, required=True, description='list of rules: broke by the comment'),
     "details":fields.List(fields.Raw(), required=True, description='list of All rules probabilities'),
 })
 
@@ -86,11 +88,12 @@ class HateSpeechClassifier(Resource):
     @ns.expect(hate_speech_single_input, validate=True)
     @ns.marshal_with(hate_speech_single_output)
     def post(self):
-        label, confidence,detail = hate_speech_classifier.predict([api.payload['text']])
-        print(detail)
-        print(marshal(detail, details_model))
+        label, confidence,rule, detail = hate_speech_classifier.predict([api.payload['text']])
+        # print(detail)
+        # print(marshal(detail, details_model))
         return {'decision': label[0],
                 'result': confidence[0],
+                'rule':rule[0],
                 "details": marshal(detail, details_model)
                 }
 
@@ -105,9 +108,10 @@ class HateSpeechListClassifier(Resource):
     @ns.expect(hate_speech_list_input, validate=True)
     @ns.marshal_with(hate_speech_list_output)
     def post(self):
-        label, confidence,detail = hate_speech_classifier.predict(api.payload['texts'])
+        label, confidence,rule, detail = hate_speech_classifier.predict(api.payload['texts'])
         return {'decision': label,
                 'result': confidence,
+                'rule':rule,
                 "details": marshal(detail, details_model)
                 }
 

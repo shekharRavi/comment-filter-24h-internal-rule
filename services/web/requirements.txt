@@ -8,12 +8,18 @@ python-dotenv
 loguru
 flask-restx
 
+markupsafe==2.0.1
+
+langdetect
+git+https://github.com/pemistahl/lingua-py.git
+
 Flask-Cors==3.0.8
 Flask-RESTful==0.3.7
 flask-restplus==0.12.1
 Flask-WTF==0.14.2
 
 numpy
+pandas
 sklearn
 
 torch==1.*
