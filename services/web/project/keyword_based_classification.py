@@ -6,7 +6,7 @@ from langdetect import detect
 from tqdm import tqdm
 
 lang_detector = LanguageDetectorBuilder.from_all_languages().with_preloaded_language_models().build()
-valid_langs= ['BOSNIAN', 'SERBIAN','CROATIAN','MONTENEGRIN', 'SLOVENE','SLOVAK', 'hr','sr','bs','cnr','sl','slv']
+valid_langs= ['BOSNIAN', 'SERBIAN','CROATIAN','MONTENEGRIN', 'SLOVENE','SLOVAK','ENGLISH', 'hr','sr','bs','cnr','sl','slv','en']
 
 dir_name = '/import/cogsci/ravi/datasets/24sata/'
 out_dir = dir_name +'word_counts/'
@@ -109,8 +109,7 @@ def check_rule_seven(text):
                     lang2 = detect(val) #Easy to run
                 except:
                     lang2 = 'hr'
-                if lang2 == 'en': #Some comments are written in English and that are fine. 
-                    lang2 = 'hr'
+    
                 # print(lang2)
                 if lang2 not in valid_langs:
                     try:
