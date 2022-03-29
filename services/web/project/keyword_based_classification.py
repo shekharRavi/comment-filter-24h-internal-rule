@@ -145,7 +145,7 @@ def keyword_based_classification(text):
     #Check blacklisted words
     rule_flag = check_blocked_words(text, not_allowed_words=not_allowed_words)
     if rule_flag:
-        rule = 3
+        rule = 9
         conf = 0.7
     else:
         #Check rule 7 based on language or all Caps
