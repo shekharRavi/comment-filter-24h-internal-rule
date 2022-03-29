@@ -17,10 +17,9 @@ RUN  apt-get update && \
     apt-get install -y netcat && \
     apt-get install -y wget && \
     apt-get install -y unzip && \
-    apt-get install -y git && \
     apt-get install -y gcc
 #git
-
+RUN apt-get install -y git
 # install dependencies
 
 #RUN --mount=type=cache,target=/root/.cache/pip \
