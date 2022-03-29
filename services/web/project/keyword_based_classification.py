@@ -192,7 +192,7 @@ def proces_file():
         #     break
 
     for rule in range(10):
-        sel_df = df[df.key_rule]==rule)
+        sel_df = df[df.key_rule]==rule]
         print(rule, (len(sel_df)*100)/len(df))
         
     save_file = out_dir+'keywords_rule_'+file_name
