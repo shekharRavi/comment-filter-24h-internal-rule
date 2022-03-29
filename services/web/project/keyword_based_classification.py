@@ -55,12 +55,15 @@ not_allowed_words = ['24sata', 'admin', 'Adolf', 'Hitler', 'jebem', 'jebemti', '
 def check_blocked_words(text,not_allowed_words=[]):
     # Simply based on the texonomy
     rule_flag = False
+    c=0
     for word in not_allowed_words:
         match = re.search(word, text)
         if match:
             rule_flag = True
             # found_word = word  # TODO: This misses if multiple words are present
-            break
+            c+=1
+            if c > 1:
+                break
     return rule_flag
 
 def upper_check(text):
@@ -158,7 +161,7 @@ def keyword_based_classification(text):
             #Check based on keywords for Rule 2,3,4,5,6
             
             rule_words = [R2, R3,R4,R5,R6, all_words]
-            thresholds = [2, 2, 2, 2, 2, 1]  #For Major rule higher threshold
+            thresholds = [2, 2, 2, 2, 2, 2]  #For Major rule higher threshold
             rules = [2,3,4,5,6,8]
             for rule_word, threshold, rule_key in zip(rule_words,thresholds, rules):
                 rule_flag = keyword_to_rule(text,rule_word,threshold=threshold)
@@ -177,7 +180,7 @@ def proces_file():
     df['key_rule']=0
 
     df = df.sample(frac=1)
-    df = df.head(50000)
+    df = df.head(10000)
     df = df.reset_index(drop=True)
 
     for i in tqdm(range(len(df))):
