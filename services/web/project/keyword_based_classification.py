@@ -158,8 +158,8 @@ def keyword_based_classification(text):
         else:
             #Check based on keywords for Rule 2,3,4,5,6
             
-            rule_words = [R2, R3,R4,R5,R6, all_words]
-            thresholds = [2, 3, 3, 4, 2, 2]  #For Major rule higher threshold
+            rule_words = [R3,R4,R5,R2,R6, all_words]
+            thresholds = [3, 3, 4,2, 2, 2]  #For Major rule higher threshold
             rules = [2,3,4,5,6,8]
             for rule_word, threshold, rule_key in zip(rule_words,thresholds, rules):
                 rule_flag = keyword_to_rule(text,rule_word,threshold=threshold)
