@@ -176,7 +176,10 @@ def proces_file():
 
     df['key_rule']=0
 
-    
+    df = df.sample(frac=1)
+    df = df.head(50000)
+    df = df.reset_index(drop=True)
+
     for i in tqdm(range(len(df))):
         content = df.loc[i,'content']
 
@@ -188,6 +191,10 @@ def proces_file():
         # if i > 100:
         #     break
 
+    for rule in range(10):
+        sel_df = df[df.key_rule]==rule)
+        print(rule, (len(sel_df)*100)/len(df))
+        
     save_file = out_dir+'keywords_rule_'+file_name
     df.to_csv(save_file, index=False)
     print('Saved to', save_file)
