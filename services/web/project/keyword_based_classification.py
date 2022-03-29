@@ -55,14 +55,14 @@ not_allowed_words = ['Adolf', 'Hitler', 'jebem', 'jebemti', 'pička', 'lezba', '
 def check_blocked_words(text,not_allowed_words=[]):
     # Simply based on the texonomy
     rule_flag = False
+    words = text.split(' ')
     c=0
-    for word in not_allowed_words:
-        match = re.search(word, text)
-        if match:
+    for word in words:
+        if word in not_allowed_words:
             rule_flag = True
             # found_word = word  # TODO: This misses if multiple words are present
             c+=1
-            if c > 2:
+            if c > 1:
                 break
     return rule_flag
 
