@@ -178,8 +178,7 @@ def proces_file():
 
     df['key_rule']=0
 
-    df = df.sample(frac=1)
-    
+    # df = df.sample(frac=1)
     # df = df.head(10000)
     # df = df.reset_index(drop=True)
 
