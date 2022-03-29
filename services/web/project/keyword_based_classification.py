@@ -109,6 +109,8 @@ def check_rule_seven(text):
                     lang2 = detect(val) #Easy to run
                 except:
                     lang2 = 'hr'
+                if lang2 = 'en': #Some comments are written in English and that are fine. 
+                    lang2 = 'hr'
                 # print(lang2)
                 if lang2 not in valid_langs:
                     try:
