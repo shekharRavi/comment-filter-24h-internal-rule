@@ -62,7 +62,7 @@ def check_blocked_words(text,not_allowed_words=[]):
             rule_flag = True
             # found_word = word  # TODO: This misses if multiple words are present
             c+=1
-            if c > 1:
+            if c > 2:
                 break
     return rule_flag
 
