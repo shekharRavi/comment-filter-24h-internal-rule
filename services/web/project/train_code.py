@@ -14,9 +14,9 @@ logger = logging.getLogger(__name__)
 from datasets import load_metric
 from datasets import load_from_disk
 
-# import wandb
-# wandb.init(project="train-classification", entity="hahackathon")
-os.environ["WANDB_DISABLED"] = "true"
+import wandb
+wandb.init(project="train-classification", entity="hahackathon")
+# os.environ["WANDB_DISABLED"] = "true"
 
 from sklearn.utils import class_weight
 
@@ -116,11 +116,11 @@ if __name__ == '__main__':
     # Training Parameters
     parser.add_argument("--output_dir", type=str, default="./results/claasify/", help='Output Directory')
     parser.add_argument("--logging_dir", type=str, default="./logs/claasify/", help='Logging Directory')
-    parser.add_argument("--num_train_epochs", type=int, default=5, help='Number of training Epochs')
+    parser.add_argument("--num_train_epochs", type=int, default=10, help='Number of training Epochs')
     parser.add_argument("--per_device_train_batch_size", type=int, default=24, help='Traiing Batch Size')
     parser.add_argument("--per_device_eval_batch_size", type=int, default=24, help='Evaluation Batch Size')
     parser.add_argument("--warmup_steps", type=int, default=500, help='Warmup Steps')
-    parser.add_argument("--weight_decay", type=int, default=0.01, help='Weight Decay Rate')
+    parser.add_argument("--weight_decay", type=int, default=0.001, help='Weight Decay Rate')
     parser.add_argument("--logging_steps", type=int, default=500, help='Logging Steps')
     parser.add_argument("--save_steps", type=int, default=5000, help='Number of updates steps before two checkpoint saves')
     parser.add_argument("--save_total_limit", type=int, default=50, help='If a value is passed, will limit the total amount of checkpoints. Deletes the older checkpoints')
@@ -128,7 +128,7 @@ if __name__ == '__main__':
     parser.add_argument("--learning_rate", default=2e-5, type=float)
 
     #Dataset
-    parser.add_argument("--dataset", type=str, default='rule', help='Training validation set large/small')
+    parser.add_argument("--dataset", type=str, default='rule_mod', help='Training validation set large/small')
 
     #Model
     parser.add_argument("--model_card", type=str, default='csebert', help='The model directory checkpoint for weights initialization.')
@@ -152,6 +152,9 @@ if __name__ == '__main__':
     save_strategy = args.save_strategy
     max_seq_length = 256
     small_dataset=args.small_dataset
+    
+
+    gradient_accumulation_steps = 8
 
     dataset = args.dataset
     train_file = datasets[dataset]['train_file']
@@ -184,6 +187,7 @@ if __name__ == '__main__':
                                                          classes=np.unique(train_labels),
                                                          y=train_labels)).to(device)
 
+    print(unique(train_labels))
 
     for model_dir in model_dirs:
         tmp_output_dir = output_dir + model_card+'_'+dataset
@@ -195,6 +199,7 @@ if __name__ == '__main__':
             output_dir=tmp_output_dir,  # output directory
             logging_dir=tmp_logging_dir,  # directory for storing logs
             num_train_epochs=num_train_epochs,  # total number of training epochs
+            gradient_accumulation_steps=gradient_accumulation_steps,
             per_device_train_batch_size=per_device_train_batch_size,  # batch size per device during training
             per_device_eval_batch_size=per_device_eval_batch_size,  # batch size for evaluation
             learning_rate = learning_rate,
@@ -204,14 +209,14 @@ if __name__ == '__main__':
             save_total_limit = save_total_limit,
             save_strategy=save_strategy,
             save_steps=save_steps,
-            # report_to="wandb", #Log into Weight and Bias
+            report_to="wandb", #Log into Weight and Bias
             evaluation_strategy="steps" #Evaluate at very logging steps
 
         )
 
         model = AutoModelForSequenceClassification.from_pretrained(model_dir, num_labels=9, classifier_dropout=0.1)
 
-        trainer = CustomTrainer(
+        trainer = Trainer(
             model=model,  # the instantiated Transformers model to be trained
             args=training_args,  # training arguments, defined above
             train_dataset=train_dataset,  # training dataset
@@ -219,7 +224,7 @@ if __name__ == '__main__':
             tokenizer = tokenizer,
             compute_metrics=compute_metrics,
             data_collator=data_collator,
-            class_weights=class_weights
+            # class_weights=class_weights
         )
 
         train_result = trainer.train(resume_from_checkpoint=None)
