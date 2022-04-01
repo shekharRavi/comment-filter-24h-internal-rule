@@ -102,6 +102,8 @@ class ModelLoad():
         r5_file = '/5_possible_words.csv'
         r6_file = '/6_possible_words.csv'
         all_file = '/possible_words.csv'
+        strict_words_file  = '/possible_words.csv'
+        not_allowed_words_file  = '/possible_words.csv'
 
         self.R2 = pd.read_csv(self.model_dir + r2_file).rule_word.tolist()
         self.R3 = pd.read_csv(self.model_dir + r3_file).rule_word.tolist()
@@ -110,29 +112,8 @@ class ModelLoad():
         self.R6 = pd.read_csv(self.model_dir + r6_file).rule_word.tolist()
         self.all_words = pd.read_csv(self.model_dir + all_file).rule_word.tolist()
 
-
-        self.not_allowed_words = ['Adolf', 'Hitler', 'jebem', 'jebemti', 'pička', 'lezba', 'majmun',
-                             'mater', 'majku', 'kurac', 'seri', 'seres', 'nabijem', 'glup', 'idijot', 'idiot', 'budala',
-                             'kreten', 'pizda', 'klad', 'kladi', 'ZDS', 'klaunski', 'mater', 'smece', 'tenkre', 'bilde',
-                             'debil', 'jebi', 'cigan', 'govn', 'seljac', 'drolj', 'kozojeb', 'musliman', 'klaunski',
-                             'derpe', 'maloumni', 'hebe', 'racku', 'spodob', 'kita', 'stoka', 'crkn', 'debel', 'krmaca',
-                             'dubre', 'djubre', 'retard', 'barbika', 'miss piggy', 'srb', 'kme', 'novina', 'pick',
-                             'nepism', 'sipt', 'ptar', 'za dom', 'srps', 'tuka', 'jeb, peni', 'udba, čas', 'šiptar',
-                             'šupak', 'ustaša', 'smrad', 'budal', 'kopile', 'imbecil', 'guba', 'stoko', 'icka', 'ubre',
-                             'gnjida', 'ljubičice', 'štraca', 'šljam', 'pupavac', 'jado', 'bilde', 'straca', 'sereš',
-                             'đubre', 'čedo', 'pička', 'jadnič', 'četn', 'kurc', 'krmača', 'lomač', 'metak', 'čelo',
-                             'jebo', 'ubit', 'asenovac', 'cetni', 'gamad', 'kurva', 'peder', 'kurvetina', 'kurv',
-                             'kobilo', 'degenerik', 'panglu', 'tenkre', 'smeće', 'sme', 'smece', 'sponzoruša',
-                             'sponzorusa',
-                             'sponz', 'konju', 'krivousti', 'krivou', 'hanzek', 'hanžek', 'lešinari', 'lesinari',
-                             'ološ', 'olos', 'papcino', 'papak', 'papčino', 'bosanko', 'bosanđeros', 'bosanceros',
-                             'bosancina', 'hercegovance', 'šupak', 'šupci', 'supak', 'supci', 'bosančeros', 'kuja',
-                             'kujica', 'dementra', 'dementna', 'nakaza', 'katolibani', 'talibani', 'papčina', 'kuraba',
-                             'ganci', 'ljadro', 'retard', 'paksu', 'droca', 'express', 'srba', 'srbi', 'expres',
-                             'šuft', 'suft', 'ćifut', 'katoliban', 'kolje', 'klati', 'kolj', 'jambrusic', 'jambrušić',
-                             'tolusic', 'tolušić', 'siptar', 'balija', 'droca', 'acab', 'a.c.a.b.', 'radman',
-                             'selekcija', 'sjajna zvijezdo', 'sjajna zvjezdo', 'celofanka', 'kravo', 'kobila',
-                             'samoprozvani', 'doktor za ljubav', 'drkolinda', 'poturica', 'poturico', 'isprdak']
+        self.strict_words = pd.read_csv(self.model_dir + strict_words_file).word.tolist()
+        self.not_allowed_words = pd.read_csv(self.model_dir + not_allowed_words_file).word.tolist()
 
     def load_models(self):
         #Return Model
@@ -178,15 +159,29 @@ class HRDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.labels)
 
-def check_blocked_words(text,not_allowed_words=[]):
+def check_strict_words(text,strict_words):
+    # Simply based on the texonomy
+    rule_flag = False
+    words = text.split(' ')
+    c=0
+    for word in words:
+        if word in strict_words:
+            rule_flag = True
+            # found_word = word  # TODO: This misses if multiple words are present
+            break
+    return rule_flag
+
+def check_blocked_words(text,not_allowed_words):
     # Simply based on the texonomy
     rule_flag = False
     words = text.split(' ')
     c=0
     for word in words:
         if word in not_allowed_words:
-            rule_flag = True
-            # found_word = word  # TODO: This misses if multiple words are present
+            if c>1:
+                rule_flag = True
+                # found_word = word  # TODO: This misses if multiple words are present
+            c+=1
             break
     return rule_flag
 
@@ -214,6 +209,8 @@ def upper_check(text):
                     rule_flag = True
                     break
     return rule_flag
+
+
 
 def check_rule_seven(text):
     # To check based on the language and upper case
@@ -458,3 +455,12 @@ def predict(data):
 #     print(len(preds_class))
 #     print(len(confidence))
 #     print(len(detail))
+    # result = pd.DataFrame([preds_class, confidence,preds_rule])
+    # result = result.transpose()
+    # result.columns = ['preds_class', 'confidence', 'preds_rule']
+    # result.head()
+    
+
+    # result.to_csv('out_file.csv', index=False)
+    # print('Output saved')
+
