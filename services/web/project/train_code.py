@@ -121,7 +121,7 @@ if __name__ == '__main__':
     parser.add_argument("--per_device_eval_batch_size", type=int, default=24, help='Evaluation Batch Size')
     parser.add_argument("--warmup_steps", type=int, default=500, help='Warmup Steps')
     parser.add_argument("--weight_decay", type=int, default=0.001, help='Weight Decay Rate')
-    parser.add_argument("--logging_steps", type=int, default=500, help='Logging Steps')
+    parser.add_argument("--logging_steps", type=int, default=1000, help='Logging Steps')
     parser.add_argument("--save_steps", type=int, default=5000, help='Number of updates steps before two checkpoint saves')
     parser.add_argument("--save_total_limit", type=int, default=50, help='If a value is passed, will limit the total amount of checkpoints. Deletes the older checkpoints')
     parser.add_argument("--save_strategy", type=str, default="epoch", help='[no/steps/epoch]The checkpoint save strategy to adopt during training')
@@ -187,7 +187,7 @@ if __name__ == '__main__':
                                                          classes=np.unique(train_labels),
                                                          y=train_labels)).to(device)
 
-    print(unique(train_labels))
+    print(np.unique(train_labels))
 
     for model_dir in model_dirs:
         tmp_output_dir = output_dir + model_card+'_'+dataset
